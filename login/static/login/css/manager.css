@@ -1,0 +1,71 @@
+body {
+    height: 100%;
+    background-image: url('../images/bg2.jpg');
+}
+
+#header {
+    font-size: 35px;
+    color: #123844bf;
+    margin: 40px 0 100px 0px;
+    font-weight: bold;
+    align-self: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.col {
+    width: 400px;
+    margin-top: -30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #88c7dd85;
+    border-radius: 10px;
+    opacity: 0.8;
+}
+
+.title {
+    margin: 20px auto;
+    font-size: 22px;
+    font-weight: 550;
+    color: #222;
+}
+
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-wrapper div{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.login-wrapper button {
+    width: 120px;
+}
+
+.login-wrapper .userManage {
+    margin-top: 15px;
+}
+
+.login-wrapper .connectManage {
+    margin-top: 15px;
+}
+
+.login-wrapper .dataManage {
+    margin-top: 15px;
+}
+
+.login-wrapper .business1 {
+    margin-top: 15px;
+}
+
+.login-wrapper .business2 {
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
