@@ -27,4 +27,7 @@ urlpatterns = [
     path('logout/', views.logout),
     path('main/', views.main),
     path('manager/', views.manager),
+    path('datamanage/', views.datamanage),
+    path('datamanage/import', views.importdata),
+    path('datamanage/export', views.exportdata),
 ]

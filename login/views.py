@@ -114,3 +114,17 @@ def main(request):
 
 def manager(request):
     return render(request, 'login/manager.html', locals())
+
+
+def datamanage(request):
+    return render(request, 'login/datamanage.html', locals())
+
+
+def importdata(request):
+    if request.method == 'POST':
+        pass
+
+
+def exportdata(request):
+    if request.method == 'POST':
+        pass
