@@ -122,7 +122,14 @@ def datamanage(request):
 
 def importdata(request):
     if request.method == 'POST':
-        pass
+        try:
+            tm = models.Tbmrodata.objects.get(timestamp=12)
+            print(tm)
+            message = '要的咯！'
+            return render(request, 'login/login.html', {'message': message})
+        except:
+            message = '该帐户不存在！'
+            return render(request, 'login/adminlogin.html', {'message': message})
 
 
 def exportdata(request):
