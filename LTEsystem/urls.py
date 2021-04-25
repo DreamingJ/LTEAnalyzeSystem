@@ -30,5 +30,8 @@ urlpatterns = [
     path('datamanage/', views.datamanage),
     path('datamanage/import', views.importdata),
     path('datamanage/export', views.exportdata),
-    path('conmanage/', views.connectmanage)
+    path('conmanage/', views.connectmanage),
+    path('conmanage/initframe/', views.initframe),
+    path('conmanage/cate1/', views.infocate1),
+    path('conmanage/cate2/', views.infocate2),
 ]

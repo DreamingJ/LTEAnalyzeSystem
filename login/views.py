@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.shortcuts import render, redirect
+from django.views.decorators.clickjacking import xframe_options_exempt
 from . import models, forms
 import hashlib
 import xlrd
@@ -151,7 +152,7 @@ def importdata(request):
                                         and -180.00000 <= float(row[11]) <= 180.00000 and -90.00000 <= float(
                                         row[12]) <= 90.00000 and row[13] in style_list and not isinstance(row[18], str)\
                                         and row[18] == row[16] + row[17]:
-                                    # 判断是否已存在该条数据
+                                    # TODO 判断是否已存在该条数据
                                     line = models.Tbcell(city=row[0],
                                                          sector_id=row[1],
                                                          sector_name=row[2],
@@ -201,3 +202,19 @@ def exportdata(request):
 
 def connectmanage(request):
     return render(request, 'login/conmanage.html', locals())
+
+
+# 允许该页面在<frame>中展示
+@xframe_options_exempt
+def initframe(request):
+    return render(request, 'login/frame.html', locals())
+
+
+@xframe_options_exempt
+def infocate1(request):
+    return render(request, 'login/info/cate1.html', locals())
+
+
+@xframe_options_exempt
+def infocate2(request):
+    return render(request, 'login/info/cate2.html', locals())

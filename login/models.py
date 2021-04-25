@@ -38,11 +38,11 @@ class Tbcell(models.Model):
     longitude = models.FloatField(db_column='LONGITUDE')  # Field name made lowercase.
     latitude = models.FloatField(db_column='LATITUDE')  # Field name made lowercase.
     style = models.CharField(db_column='STYLE', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    azimuth = models.FloatField(db_column='AZIMUTH', blank=True)  # Field name made lowercase.
+    azimuth = models.FloatField(db_column='AZIMUTH')  # Field name made lowercase.
     height = models.FloatField(db_column='HEIGHT', blank=True, null=True)  # Field name made lowercase.
     electtilt = models.FloatField(db_column='ELECTTILT', blank=True, null=True)  # Field name made lowercase.
     mechtilt = models.FloatField(db_column='MECHTILT', blank=True, null=True)  # Field name made lowercase.
-    totletilt = models.FloatField(db_column='TOTLETILT', blank=True)  # Field name made lowercase.
+    totletilt = models.FloatField(db_column='TOTLETILT')  # Field name made lowercase.
 
     class Meta:
         managed = True
