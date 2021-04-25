@@ -30,4 +30,5 @@ urlpatterns = [
     path('datamanage/', views.datamanage),
     path('datamanage/import', views.importdata),
     path('datamanage/export', views.exportdata),
+    path('conmanage/', views.connectmanage)
 ]

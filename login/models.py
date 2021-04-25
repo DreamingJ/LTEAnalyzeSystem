@@ -38,11 +38,11 @@ class Tbcell(models.Model):
     longitude = models.FloatField(db_column='LONGITUDE')  # Field name made lowercase.
     latitude = models.FloatField(db_column='LATITUDE')  # Field name made lowercase.
     style = models.CharField(db_column='STYLE', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    azimuth = models.FloatField(db_column='AZIMUTH', blank=True, null=True)  # Field name made lowercase.
+    azimuth = models.FloatField(db_column='AZIMUTH', blank=True)  # Field name made lowercase.
     height = models.FloatField(db_column='HEIGHT', blank=True, null=True)  # Field name made lowercase.
     electtilt = models.FloatField(db_column='ELECTTILT', blank=True, null=True)  # Field name made lowercase.
     mechtilt = models.FloatField(db_column='MECHTILT', blank=True, null=True)  # Field name made lowercase.
-    totletilt = models.FloatField(db_column='TOTLETILT', blank=True, null=True)  # Field name made lowercase.
+    totletilt = models.FloatField(db_column='TOTLETILT', blank=True)  # Field name made lowercase.
 
     class Meta:
         managed = True
@@ -59,7 +59,7 @@ class Tbkpi(models.Model):
     sector_name = models.CharField(db_column='SECTOR_NAME', primary_key=True, max_length=255)  # Field name made lowercase.
     rpc_establish = models.IntegerField(db_column='RPC_ESTABLISH')  # Field name made lowercase.
     rpc_request = models.IntegerField(db_column='RPC_REQUEST')  # Field name made lowercase.
-    rpc_succrate = models.FloatField(db_column='RPC_SUCCRATE')  # Field name made lowercase.
+    rpc_succrate = models.FloatField(db_column='RPC_SUCCRATE', null=True)  # Field name made lowercase.
     erab_succ = models.IntegerField(db_column='ERAB_SUCC')  # Field name made lowercase.
     erab_att = models.IntegerField(db_column='ERAB_ATT')  # Field name made lowercase.
     erab_succrate = models.FloatField(db_column='ERAB_SUCCRATE')  # Field name made lowercase.
@@ -215,9 +215,9 @@ class Tbprb(models.Model):
 
 # 用到， 多属性主键，暂未解决  由于没有主键，新增了id
 class Tbmrodata(models.Model):
-    timestamp = models.CharField(db_column='TimeStamp', max_length=30, blank=True, null=True)  # Field name made lowercase.
-    servingsector = models.CharField(db_column='ServingSector', max_length=30, blank=True, null=True)  # Field name made lowercase.
-    interferingsector = models.CharField(db_column='InterferingSector', max_length=30, blank=True, null=True)  # Field name made lowercase.
+    timestamp = models.CharField(db_column='TimeStamp', max_length=30)  # Field name made lowercase.
+    servingsector = models.CharField(db_column='ServingSector', max_length=30)  # Field name made lowercase.
+    interferingsector = models.CharField(db_column='InterferingSector', max_length=30)  # Field name made lowercase.
     ltescrsrp = models.FloatField(db_column='LteScRSRP', blank=True, null=True)  # Field name made lowercase.
     ltencrsrp = models.FloatField(db_column='LteNcRSRP', blank=True, null=True)  # Field name made lowercase.
     ltencearfcn = models.IntegerField(db_column='LteNcEarfcn', blank=True, null=True)  # Field name made lowercase.

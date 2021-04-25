@@ -9,22 +9,22 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
     <link href="{% static 'login/css/datamanage.css' %}" rel="stylesheet"/>
-    <title>LTE网络干扰分析系统-数据管理</title>
+    <title>LTE网络干扰分析系统-连接管理</title>
 
 </head>
 <body>
 <div class="container">
-    <div id="header">LTE网络干扰分析系统<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数据管理</div></div>
+    <div id="header">LTE网络干扰分析系统<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;连接管理</div></div>
 </div>
 
 <div class="wrapper">
     <div class="col-left">
-        <form class="form-import" action="/datamanage/import" method="post" enctype="multipart/form-data">
+        <form class="form-import" action="/conmanage/" method="post">
             {% csrf_token %}
             {% if message %}
                 <div class="alert alert-warning alert-dismissible">{{ message }}</div>
             {% endif %}
-            <div class="title">数据导入</div>
+            <div class="title">查看信息</div>
             <div>导入目的表：</div>
             <select name="table">
                 <option value="tbcell">tbCell</option>
@@ -49,7 +49,7 @@
     <div class="col-right">
         <form class="form-export" action="/datamanage/export" method="post">
             {% csrf_token %}
-            <div class="title">数据导出</div>
+            <div class="title">修改参数</div>
             <div>选择关系表：</div>
             <select name="tables-export">
                 <option value="tbCell">tbCell</option>
