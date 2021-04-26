@@ -18,47 +18,53 @@
         <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;连接管理</div>
     </div>
 
+    <div class="parent-wrapper">
 
-    <div class="wrapper">
-        <div class="col-left">
+        <div class="wrapper">
+            <div class="col-left">
 
-            <div class="title">查看信息</div>
-            {#            <a href="/information/" target="ifame_info">数据库连接时长</a>#}
-            {#            <a href="/information/" target="ifame_info">数据库连接时长</a>#}
-            {#            <div class="button">#}
-            {#                <button type="submit" class="btn btn-primary float-right">配置信息</button>#}
-            {#            </div>#}
-            <div class="button">
-                <button onclick="iframeclick(1)" class="btn btn-primary float-right">数据库连接时长</button>
+                <div class="title">查看信息</div>
+                {#            <a href="/information/" target="ifame_info">数据库连接时长</a>#}
+                {#            <a href="/information/" target="ifame_info">数据库连接时长</a>#}
+                {#            <div class="button">#}
+                {#                <button type="submit" class="btn btn-primary float-right">配置信息</button>#}
+                {#            </div>#}
+                <div class="button">
+                    <button onclick="iframeclick(1)" class="btn btn-primary float-right">数据库连接时长</button>
+                </div>
+                <div class="button">
+                    <button onclick="iframeclick(3)" class="btn btn-primary float-right">缓冲区大小</button>
+                </div>
+                <div class="button">
+                    <button onclick="iframeclick(2)" class="btn btn-primary float-right">数据库配置信息</button>
+                </div>
+                <script>
+                    function iframeclick(key) {
+                        document.getElementById("iframe_info").src = "cate" + key + "/";
+                        document.getElementById("iframe_info").style.display = "Block";
+                    };
+                </script>
             </div>
-            <div class="button">
-                <button onclick="iframeclick(2)" class="btn btn-primary float-right">数据库配置信息</button>
+            <div class="col-right">
+                <form class="param" action="/conmanage/" method="post">
+                    {% csrf_token %}
+                    <div class="title">修改参数</div>
+                    <label for="timelong">连接时长：</label>
+                    <input type="text" name="time" id="timelong">
+                    <label for="size">缓冲区大小：</label>
+                    <input type="text" name="cachesize" id="size"><br>
+                    <div class="button">
+                        <button type="submit" class="btn btn-primary float-right">确认修改</button>
+                    </div>
+                </form>
             </div>
-            <script>
-                function iframeclick(key) {
-                    document.getElementById("iframe_info").src = "cate" + key + "/";
-                    document.getElementById("iframe_info").style.display = "Block";
-                };
-            </script>
         </div>
         <div class="iframe">
-            <iframe src="initframe/" id="iframe_info" width="600" height="250" frameborder="1"></iframe>
+            <iframe src="initframe/" id="iframe_info" width="600" height="550" frameborder="1"></iframe>
         </div>
     </div>
-    <div class="col-right">
-        <form class=configure" action="/conmanage/" method="post">
-            {% csrf_token %}
-            <div class="title">修改参数</div>
-            <P>请输入参数：</P>
-            连接时长：<input type="text" name="time"><br><br>
-            缓冲区大小：<input type="text" name="cachesize"><br><br>
-            <div class="button">
-                <button type="submit" class="btn btn-primary float-right">确认修改</button>
-            </div>
-        </form>
-    </div>
-
 </div>
+
 
 <div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
 <!-- Optional JavaScript -->

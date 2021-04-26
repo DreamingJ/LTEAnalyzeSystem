@@ -15,7 +15,10 @@
 <body>
 <div class="container">
     <div id="header">LTE网络干扰分析系统</div>
-
+    <div id="welcome">
+        管理员{{ request.session.admin_name }}!欢迎！
+        <a href="/adminlogout/">退出登录</a>
+    </div>
     <div class="col">
         {% csrf_token %}
 

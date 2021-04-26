@@ -25,6 +25,7 @@ urlpatterns = [
     path('adminlogin/', views.adminlogin),
     path('register/', views.register),
     path('logout/', views.logout),
+    path('adminlogout/', views.adminlogout),
     path('main/', views.main),
     path('manager/', views.manager),
     path('datamanage/', views.datamanage),
@@ -34,4 +35,5 @@ urlpatterns = [
     path('conmanage/initframe/', views.initframe),
     path('conmanage/cate1/', views.infocate1),
     path('conmanage/cate2/', views.infocate2),
+    path('conmanage/cate3/', views.infocate3),
 ]

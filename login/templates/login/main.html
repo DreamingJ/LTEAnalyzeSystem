@@ -15,32 +15,36 @@
 <body>
 <div class="container">
     <div id="header">LTE网络干扰分析系统</div>
-
-    <div class="col">
-            {% csrf_token %}
-
-            <div class="title">功能菜单</div>
-            <div class="login-wrapper">
-                <div class="dataManage">
-                    <a href="/datamanage/">
-                        <button type="button" class="btn btn-primary float-right">数据管理
-                        </button>
-                    </a>
-                </div>
-                <div class="business1">
-                    <a href="/search/">
-                        <button type="button" class="btn btn-primary float-right">业务查询
-                        </button>
-                    </a>
-                </div>
-                <div class="business2">
-                    <a href="/analyze/">
-                        <button type="button" class="btn btn-primary float-right">业务分析
-                        </button>
-                    </a>
-                </div>
-            </div>
+    <div id="welcome">
+        {{ request.session.user_name }}!欢迎！
+        <a href="/logout/">退出登录</a>
     </div>
+    <div class="col">
+        {% csrf_token %}
+
+        <div class="title">功能菜单</div>
+        <div class="login-wrapper">
+            <div class="dataManage">
+                <a href="/datamanage/">
+                    <button type="button" class="btn btn-primary float-right">数据管理
+                    </button>
+                </a>
+            </div>
+            <div class="business1">
+                <a href="/search/">
+                    <button type="button" class="btn btn-primary float-right">业务查询
+                    </button>
+                </a>
+            </div>
+            <div class="business2">
+                <a href="/analyze/">
+                    <button type="button" class="btn btn-primary float-right">业务分析
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div> <!-- /container -->
 <div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
 <!-- Optional JavaScript -->

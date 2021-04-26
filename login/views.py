@@ -1,5 +1,6 @@
-from django.db import transaction
+from django.db import connection, transaction
 from django.shortcuts import render, redirect
+from django.db import models as md
 from django.views.decorators.clickjacking import xframe_options_exempt
 from . import models, forms
 import hashlib
@@ -8,6 +9,12 @@ import xlwt
 
 
 # Create your views here.
+class Variable(md.Model):
+    Variable_name = md.CharField(max_length=128, primary_key=True)
+    Value = md.IntegerField()
+
+    def __str__(self):
+        return self.Variable_name
 
 
 # To encode the password
@@ -28,6 +35,8 @@ def index(request):
 
 
 def login(request):
+    # if request.session.get('is_login', None):  # 已登录不允许重复登录
+    #     return redirect('/main/')
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -40,6 +49,9 @@ def login(request):
                 return render(request, 'login/login.html', {'message': message})
             # 使用密码哈希值进行比对
             if user.password == hash_code(password):
+                request.session['is_login'] = True
+                request.session['user_id'] = user.id
+                request.session['user_name'] = user.name
                 return redirect('/main/')
             else:
                 message = '密码错误！'
@@ -66,6 +78,9 @@ def adminlogin(request):
                 message = '密码错误！'
                 return render(request, 'login/adminlogin.html', {'message': message})
             elif user.dbpassword == dbpassword:
+                request.session['is_admin'] = True
+                request.session['admin_id'] = user.id
+                request.session['admin_name'] = user.name
                 return redirect('/manager/')
             else:
                 message = '数据库口令错误！'
@@ -73,6 +88,22 @@ def adminlogin(request):
         else:
             return render(request, 'login/adminlogin.html', {'message': message})
     return render(request, 'login/adminlogin.html')
+
+
+def logout(request):
+    if not request.session.get('is_login', None):
+        # 如果本来就未登录，不用登出
+        return redirect("/login/")
+    request.session.flush()
+    return redirect('/login/')
+
+
+def adminlogout(request):
+    if not request.session.get('is_admin', None):
+        # 如果本来就未登录，不用登出
+        return redirect("/adminlogin/")
+    request.session.flush()
+    return redirect('/adminlogin/')
 
 
 def register(request):
@@ -106,21 +137,22 @@ def register(request):
     return render(request, 'login/register.html', locals())
 
 
-# 用户登出
-def logout(request):
-    return redirect('/login/')
-
-
 # 用户主界面
 def main(request):
+    if not request.session.get('is_login', None):  # 未登录，不允许直接访问
+        return redirect('/login/')
     return render(request, 'login/main.html', locals())
 
 
 def manager(request):
+    if not request.session.get('is_admin', None):  # 未登录，不允许直接访问
+        return redirect('/adminlogin/')
     return render(request, 'login/manager.html', locals())
 
 
 def datamanage(request):
+    if not request.session.get('is_admin', None):  # 未登录，不允许直接访问
+        return redirect('/adminlogin/')
     return render(request, 'login/datamanage.html', locals())
 
 
@@ -130,6 +162,8 @@ def importdata(request):
     pci_list = [x for x in range(504)]
     vendor_list = ['华为', '中兴', '诺西', '爱立信', '贝尔', '大唐']
     style_list = ['室分', '宏站']
+    if not request.session.get('is_admin', None):  # 未登录，不允许直接访问
+        return redirect('/adminlogin/')
     if request.method == 'POST':
         f = request.FILES['upfile']
         filetype = f.name.split('.')[2]
@@ -196,12 +230,28 @@ def importdata(request):
 
 
 def exportdata(request):
+    if not request.session.get('is_login', None):  # 未登录，不允许直接访问
+        return redirect('/login/')
     if request.method == 'POST':
         pass
 
 
 def connectmanage(request):
+    if request.method == "POST":
+        time = request.POST.get('time')
+        cachesize = request.POST.get('cachesize')
+        if time!="":
+            sql="set global wait_timeout="+time+';'
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            transaction.commit()
+        if cachesize !="":
+            sql="set  global key_buffer_size="+cachesize+';'
+            cursor = connection.cursor()
+            cursor.execute(sql)
+            transaction.commit()
     return render(request, 'login/conmanage.html', locals())
+
 
 
 # 允许该页面在<frame>中展示
@@ -212,9 +262,24 @@ def initframe(request):
 
 @xframe_options_exempt
 def infocate1(request):
+    for var in Variable.objects.raw("show global variables like 'wait_timeout';"):
+        wait_timeout = var.Value
+    for variable in Variable.objects.raw("show global variables like 'interactive_timeout';"):
+        interactive_timeout = variable.Value
     return render(request, 'login/info/cate1.html', locals())
 
 
 @xframe_options_exempt
 def infocate2(request):
+    var_map = {}
+    for var in Variable.objects.raw('show global variables;'):
+        var_map[var.Variable_name] = var.Value
+    print(var_map)
     return render(request, 'login/info/cate2.html', locals())
+
+
+@xframe_options_exempt
+def infocate3(request):
+    for var in Variable.objects.raw("show global variables like 'key_buffer_size';"):
+        key_buffer_size=var.Value
+    return render(request, 'login/info/cate3.html', locals())
