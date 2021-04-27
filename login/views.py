@@ -1,8 +1,10 @@
+import csv
 import time
 import traceback
 
 from django.contrib import messages
 from django.db import connection, transaction
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db import models as md
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -449,7 +451,58 @@ def exportdata(request):
     if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
         return redirect('/login/')
     if request.method == 'POST':
-        pass
+        table_name = request.POST['tables-export']
+        format = request.POST['format']
+        if format == 'excel':
+            response = HttpResponse(content_type='application/ms-excel')
+        else:
+            response = HttpResponse(content_type='text/csv')
+        if (table_name == 'tbCell'):
+            rows = models.Tbcell.objects.all()
+        elif (table_name == 'tbKPI'):
+            rows = models.Tbkpi.objects.all()
+        elif (table_name == 'tbPRB'):
+            rows = models.Tbprb.objects.all()
+        else:
+            rows = models.Tbmrodata.objects.all()
+        rows_list = list(rows.values())
+        columns = []
+        if not rows:
+            return render(request, "login/datamanage.html", {'message': '此数据表为空！'})
+        for key in rows_list[0]:
+            columns.append(key)
+        try:
+            if format == 'excel':
+                # response = HttpResponse(content_type='application/ms-excel')
+                response['Content-Disposition'] = 'attachment; filename="' + table_name + '.xls"'
+                wb = xlwt.Workbook(encoding='utf-8')
+                ws = wb.add_sheet(table_name)
+                # Sheet header, first row
+                row_num = 0
+                font_style = xlwt.XFStyle()
+                font_style.font.bold = True
+                # Sheet body, remaining rows
+                font_style = xlwt.XFStyle()
+                for col_num in range(len(columns)):
+                    ws.write(row_num, col_num, columns[col_num], font_style)
+                for row in rows_list:
+                    row_num += 1
+                    # print(row.get(columns[0]))
+                    for col_num in range(len(row)):
+                        ws.write(row_num, col_num, row.get(columns[col_num]), font_style)
+                wb.save(response)
+                return response
+            else:
+                # response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="' + table_name + '.csv"'
+                writer = csv.writer(response)
+                writer.writerow(columns)
+                for row in rows_list:
+                    writer.writerow(row.values())
+                return response
+        except:
+            print('error')
+    return response
 
 
 # TODO 之后增加下拉框，用户能自由选择修改哪个缓冲区
