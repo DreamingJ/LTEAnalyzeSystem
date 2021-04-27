@@ -14,7 +14,9 @@
 </head>
 <body>
 <div class="container">
-    <div id="header">LTE网络干扰分析系统<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数据管理</div></div>
+    <div id="header">LTE网络干扰分析系统
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数据管理</div>
+    </div>
 </div>
 
 <div class="wrapper">
@@ -22,7 +24,10 @@
         <form class="form-import" action="/datamanage/import" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {% if message %}
-                <div class="alert alert-warning alert-dismissible">{{ message }}</div>
+                <script>
+                        alert('{{ message }}');
+                </script>
+                {#                <div class="alert alert-warning alert-dismissible">{{ message }}</div>#}
             {% endif %}
             <div class="title">数据导入</div>
             <div>导入目的表：</div>
@@ -62,7 +67,8 @@
             <input type="radio" name="format" value="excel" checked>Excel&nbsp;&nbsp;&nbsp;&nbsp;
             <input type="radio" name="format" value="txt">TXT<br>
             <br>
-            <div>请选择导出路径：</div><br>
+            <div>请选择导出路径：</div>
+            <br>
             <div class="button">
                 <button type="submit" class="btn btn-primary float-right">导出</button>
             </div>

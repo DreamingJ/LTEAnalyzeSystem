@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 # 新增的四张表的模型类
 
@@ -50,50 +51,74 @@ class Tbcell(models.Model):
 
 
 class Tbkpi(models.Model):
-    date = models.DateField(db_column='Date')  # Field name made lowercase.
+    date = models.DateField(db_column='Date', blank=True, null=True)  # Field name made lowercase.
     enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
-    # 报错：login.Tbprb.enodeb_name: (fields.E312) The to_field '<django.db.models.query_utils.DeferredAttribute object at 0x03F29898>' doesn't exist on the related model 'login.Tbcell'.
     # enodeb_name = models.ForeignKey('Tbcell', on_delete=models.CASCADE, to_field=Tbcell.enodeb_name,
     #                                 db_column='ENODEB_NAME')
+    # enodeb_name = models.ForeignKey(Tbcell, on_delete=models.CASCADE,
+    #                                 db_column='ENODEB_NAME')  # Field name made lowercase.
     sector = models.CharField(db_column='SECTOR', max_length=255)  # Field name made lowercase.
-    sector_name = models.CharField(db_column='SECTOR_NAME', primary_key=True, max_length=255)  # Field name made lowercase.
-    rpc_establish = models.IntegerField(db_column='RPC_ESTABLISH')  # Field name made lowercase.
-    rpc_request = models.IntegerField(db_column='RPC_REQUEST')  # Field name made lowercase.
-    rpc_succrate = models.FloatField(db_column='RPC_SUCCRATE', null=True)  # Field name made lowercase.
-    erab_succ = models.IntegerField(db_column='ERAB_SUCC')  # Field name made lowercase.
-    erab_att = models.IntegerField(db_column='ERAB_ATT')  # Field name made lowercase.
-    erab_succrate = models.FloatField(db_column='ERAB_SUCCRATE')  # Field name made lowercase.
-    enodeb_erab_ex = models.IntegerField(db_column='ENODEB_ERAB_EX')  # Field name made lowercase.
-    sector_switch_erab_ex = models.IntegerField(db_column='SECTOR_SWITCH_ERAB_EX')  # Field name made lowercase.
-    erab_lossrate = models.FloatField(db_column='ERAB_LOSSRATE')  # Field name made lowercase.
-    ay = models.FloatField(db_column='AY')  # Field name made lowercase.
-    enodeb_reset_ue_release = models.IntegerField(db_column='ENODEB_RESET_UE_RELEASE')  # Field name made lowercase.
-    ue_ex_release = models.IntegerField(db_column='UE_EX_RELEASE')  # Field name made lowercase.
-    ue_succ = models.IntegerField(db_column='UE_SUCC')  # Field name made lowercase.
-    lossrate = models.FloatField(db_column='LOSSRATE')  # Field name made lowercase.
-    enodeb_in_diff_succ = models.IntegerField(db_column='ENODEB_IN_DIFF_SUCC')  # Field name made lowercase.
-    enodeb_in_diff_att = models.IntegerField(db_column='ENODEB_IN_DIFF_ATT')  # Field name made lowercase.
-    enodeb_in_same_succ = models.IntegerField(db_column='ENODEB_IN_SAME_SUCC')  # Field name made lowercase.
-    enodeb_in_same_att = models.IntegerField(db_column='ENODEB_IN_SAME_ATT')  # Field name made lowercase.
-    enodeb_out_diff_succ = models.IntegerField(db_column='ENODEB_OUT_DIFF_SUCC')  # Field name made lowercase.
-    enodeb_out_diff_att = models.IntegerField(db_column='ENODEB_OUT_DIFF_ATT')  # Field name made lowercase.
-    enodeb_out_same_succ = models.IntegerField(db_column='ENODEB_OUT_SAME_SUCC')  # Field name made lowercase.
-    enodeb_out_same_att = models.IntegerField(db_column='ENODEB_OUT_SAME_ATT')  # Field name made lowercase.
-    enodeb_in_succrate = models.FloatField(db_column='ENODEB_IN_SUCCRATE')  # Field name made lowercase.
-    enodeb_out_succrate = models.FloatField(db_column='ENODEB_OUT_SUCCRATE')  # Field name made lowercase.
-    enodeb_same_succrate = models.FloatField(db_column='ENODEB_SAME_SUCCRATE')  # Field name made lowercase.
-    enodeb_diff_succrate = models.FloatField(db_column='ENODEB_DIFF_SUCCRATE')  # Field name made lowercase.
-    enodeb_switch_succrate = models.FloatField(db_column='ENODEB_SWITCH_SUCCRATE')  # Field name made lowercase.
-    pdcp_up = models.IntegerField(db_column='PDCP_UP')  # Field name made lowercase.
-    pdcp_down = models.IntegerField(db_column='PDCP_DOWN')  # Field name made lowercase.
-    rpc_rebuild = models.IntegerField(db_column='RPC_REBUILD')  # Field name made lowercase.
-    rpc_rebuildrate = models.FloatField(db_column='RPC_REBUILDRATE')  # Field name made lowercase.
-    rebuild_enodeb_out_same_succ = models.IntegerField(db_column='REBUILD_ENODEB_OUT_SAME_SUCC')  # Field name made lowercase.
-    rebuild_enodeb_out_diff_succ = models.IntegerField(db_column='REBUILD_ENODEB_OUT_DIFF_SUCC')  # Field name made lowercase.
-    rebuild_enodeb_in_same_succ = models.IntegerField(db_column='REBUILD_ENODEB_IN_SAME_SUCC')  # Field name made lowercase.
-    rebuild_enodeb_in_diff_succ = models.IntegerField(db_column='REBUILD_ENODEB_IN_DIFF_SUCC')  # Field name made lowercase.
-    enb_in_succ = models.IntegerField(db_column='ENB_IN_SUCC')  # Field name made lowercase.
-    eno_in_request = models.IntegerField(db_column='ENO_IN_REQUEST')  # Field name made lowercase.
+    sector_name = models.CharField(db_column='SECTOR_NAME', primary_key=True,
+                                   max_length=255)  # Field name made lowercase.
+    rpc_establish = models.IntegerField(db_column='RPC_ESTABLISH', blank=True, null=True)  # Field name made lowercase.
+    rpc_request = models.IntegerField(db_column='RPC_REQUEST', blank=True, null=True)  # Field name made lowercase.
+    rpc_succrate = models.FloatField(db_column='RPC_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    erab_succ = models.IntegerField(db_column='ERAB_SUCC', blank=True, null=True)  # Field name made lowercase.
+    erab_att = models.IntegerField(db_column='ERAB_ATT', blank=True, null=True)  # Field name made lowercase.
+    erab_succrate = models.FloatField(db_column='ERAB_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    enodeb_erab_ex = models.IntegerField(db_column='ENODEB_ERAB_EX', blank=True,
+                                         null=True)  # Field name made lowercase.
+    sector_switch_erab_ex = models.IntegerField(db_column='SECTOR_SWITCH_ERAB_EX', blank=True,
+                                                null=True)  # Field name made lowercase.
+    erab_lossrate = models.FloatField(db_column='ERAB_LOSSRATE', blank=True, null=True)  # Field name made lowercase.
+    ay = models.FloatField(db_column='AY', blank=True, null=True)  # Field name made lowercase.
+    enodeb_reset_ue_release = models.IntegerField(db_column='ENODEB_RESET_UE_RELEASE', blank=True,
+                                                  null=True)  # Field name made lowercase.
+    ue_ex_release = models.IntegerField(db_column='UE_EX_RELEASE', blank=True, null=True)  # Field name made lowercase.
+    ue_succ = models.IntegerField(db_column='UE_SUCC', blank=True, null=True)  # Field name made lowercase.
+    lossrate = models.FloatField(db_column='LOSSRATE', blank=True, null=True)  # Field name made lowercase.
+    enodeb_in_diff_succ = models.IntegerField(db_column='ENODEB_IN_DIFF_SUCC', blank=True,
+                                              null=True)  # Field name made lowercase.
+    enodeb_in_diff_att = models.IntegerField(db_column='ENODEB_IN_DIFF_ATT', blank=True,
+                                             null=True)  # Field name made lowercase.
+    enodeb_in_same_succ = models.IntegerField(db_column='ENODEB_IN_SAME_SUCC', blank=True,
+                                              null=True)  # Field name made lowercase.
+    enodeb_in_same_att = models.IntegerField(db_column='ENODEB_IN_SAME_ATT', blank=True,
+                                             null=True)  # Field name made lowercase.
+    enodeb_out_diff_succ = models.IntegerField(db_column='ENODEB_OUT_DIFF_SUCC', blank=True,
+                                               null=True)  # Field name made lowercase.
+    enodeb_out_diff_att = models.IntegerField(db_column='ENODEB_OUT_DIFF_ATT', blank=True,
+                                              null=True)  # Field name made lowercase.
+    enodeb_out_same_succ = models.IntegerField(db_column='ENODEB_OUT_SAME_SUCC', blank=True,
+                                               null=True)  # Field name made lowercase.
+    enodeb_out_same_att = models.IntegerField(db_column='ENODEB_OUT_SAME_ATT', blank=True,
+                                              null=True)  # Field name made lowercase.
+    enodeb_in_succrate = models.FloatField(db_column='ENODEB_IN_SUCCRATE', blank=True,
+                                           null=True)  # Field name made lowercase.
+    enodeb_out_succrate = models.FloatField(db_column='ENODEB_OUT_SUCCRATE', blank=True,
+                                            null=True)  # Field name made lowercase.
+    enodeb_same_succrate = models.FloatField(db_column='ENODEB_SAME_SUCCRATE', blank=True,
+                                             null=True)  # Field name made lowercase.
+    enodeb_diff_succrate = models.FloatField(db_column='ENODEB_DIFF_SUCCRATE', blank=True,
+                                             null=True)  # Field name made lowercase.
+    enodeb_switch_succrate = models.FloatField(db_column='ENODEB_SWITCH_SUCCRATE', blank=True,
+                                               null=True)  # Field name made lowercase.
+    pdcp_up = models.BigIntegerField(db_column='PDCP_UP', blank=True, null=True)  # Field name made lowercase.
+    pdcp_down = models.BigIntegerField(db_column='PDCP_DOWN', blank=True, null=True)  # Field name made lowercase.
+    rpc_rebuild = models.IntegerField(db_column='RPC_REBUILD', blank=True, null=True)  # Field name made lowercase.
+    rpc_rebuildrate = models.FloatField(db_column='RPC_REBUILDRATE', blank=True,
+                                        null=True)  # Field name made lowercase.
+    rebuild_enodeb_out_same_succ = models.IntegerField(db_column='REBUILD_ENODEB_OUT_SAME_SUCC', blank=True,
+                                                       null=True)  # Field name made lowercase.
+    rebuild_enodeb_out_diff_succ = models.IntegerField(db_column='REBUILD_ENODEB_OUT_DIFF_SUCC', blank=True,
+                                                       null=True)  # Field name made lowercase.
+    rebuild_enodeb_in_same_succ = models.IntegerField(db_column='REBUILD_ENODEB_IN_SAME_SUCC', blank=True,
+                                                      null=True)  # Field name made lowercase.
+    rebuild_enodeb_in_diff_succ = models.IntegerField(db_column='REBUILD_ENODEB_IN_DIFF_SUCC', blank=True,
+                                                      null=True)  # Field name made lowercase.
+    enb_in_succ = models.IntegerField(db_column='ENB_IN_SUCC', blank=True, null=True)  # Field name made lowercase.
+    eno_in_request = models.IntegerField(db_column='ENO_IN_REQUEST', blank=True,
+                                         null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True
@@ -103,10 +128,11 @@ class Tbkpi(models.Model):
 class Tbprb(models.Model):
     date = models.DateField(db_column='Date')  # Field name made lowercase.
     enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
-    # enodeb_name = models.ForeignKey('Tbcell', on_delete=models.CASCADE, to_field=Tbcell.enodeb_name,
-    #                                 db_column='ENODEB_NAME')
+    # enodeb_name = models.ForeignKey(Tbcell, on_delete=models.CASCADE,
+    #                                 db_column='ENODEB_NAME')  # Field name made lowercase.
     sector_description = models.CharField(db_column='SECTOR_DESCRIPTION', max_length=255)  # Field name made lowercase.
-    sector_name = models.CharField(db_column='SECTOR_NAME', primary_key=True, max_length=255)  # Field name made lowercase.
+    sector_name = models.CharField(db_column='SECTOR_NAME', primary_key=True,
+                                   max_length=255)  # Field name made lowercase.
     avr_noise_prb0 = models.IntegerField(db_column='AVR_NOISE_PRB0')  # Field name made lowercase.
     avr_noise_prb1 = models.IntegerField(db_column='AVR_NOISE_PRB1')  # Field name made lowercase.
     avr_noise_prb2 = models.IntegerField(db_column='AVR_NOISE_PRB2')  # Field name made lowercase.
@@ -213,11 +239,10 @@ class Tbprb(models.Model):
         db_table = 'tbprb'
 
 
-# 用到， 多属性主键，暂未解决  由于没有主键，新增了id
 class Tbmrodata(models.Model):
-    timestamp = models.CharField(db_column='TimeStamp', max_length=30)  # Field name made lowercase.
-    servingsector = models.CharField(db_column='ServingSector', max_length=30)  # Field name made lowercase.
-    interferingsector = models.CharField(db_column='InterferingSector', max_length=30)  # Field name made lowercase.
+    timestamp = models.CharField(db_column='TimeStamp', primary_key=True, max_length=30)  # Field name made lowercase.
+    servingsector = models.CharField(db_column='ServingSector', max_length=50)  # Field name made lowercase.
+    interferingsector = models.CharField(db_column='InterferingSector', max_length=50)  # Field name made lowercase.
     ltescrsrp = models.FloatField(db_column='LteScRSRP', blank=True, null=True)  # Field name made lowercase.
     ltencrsrp = models.FloatField(db_column='LteNcRSRP', blank=True, null=True)  # Field name made lowercase.
     ltencearfcn = models.IntegerField(db_column='LteNcEarfcn', blank=True, null=True)  # Field name made lowercase.
