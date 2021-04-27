@@ -1,12 +1,31 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>information</title>
+    <link href="{% static 'login/css/cate.css' %}" rel="stylesheet"/>
 </head>
 <body>
-<div>连接时长：</div>
-wait_timeout:<div>{{ wait_timeout }}</div>
-interactive_timeout:<div>{{ interactive_timeout }}</div>
+<div class="wrapper">
+    <div class="title">连接时长：</div>
+
+    <table class="table" border="1">
+        <tr>
+            <th>Variable</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>wait_timeout:</td>
+            <td>{{ wait_timeout }}</td>
+        </tr>
+        <ul>
+            <tr>
+                <td>interactive_timeout:</td>
+                <td>{{ interactive_timeout }}</td>
+            </tr>
+        </ul>
+    </table>
+</div>
 </body>
 </html>

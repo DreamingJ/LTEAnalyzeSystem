@@ -1,11 +1,26 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>information</title>
+        <link href="{% static 'login/css/cate.css' %}" rel="stylesheet"/>
 </head>
 <body>
-<div>缓冲区大小：</div>
-key_buffer_size:<div>{{ key_buffer_size }}</div>
+<div class="wrapper">
+<div class="title">缓冲区大小：</div>
+
+<table class="table" border="1">
+    <tr>
+        <th>Variable</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>key_buffer_size:</td>
+                <td>{{ key_buffer_size }}</td>
+    </tr>
+</table>
+</div>
+</div>
 </body>
 </html>

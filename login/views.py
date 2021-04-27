@@ -1,3 +1,6 @@
+import traceback
+
+from django.contrib import messages
 from django.db import connection, transaction
 from django.shortcuts import render, redirect
 from django.db import models as md
@@ -151,8 +154,8 @@ def manager(request):
 
 
 def datamanage(request):
-    if not request.session.get('is_admin', None):  # 未登录，不允许直接访问
-        return redirect('/adminlogin/')
+    if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
+        return redirect('/login/')
     return render(request, 'login/datamanage.html', locals())
 
 
@@ -236,20 +239,29 @@ def exportdata(request):
         pass
 
 
+# TODO 之后增加下拉框，用户能自由选择修改哪个缓冲区
 def connectmanage(request):
     if request.method == "POST":
         time = request.POST.get('time')
         cachesize = request.POST.get('cachesize')
-        if time!="":
+        if time != "":
             sql="set global wait_timeout="+time+';'
             cursor = connection.cursor()
-            cursor.execute(sql)
-            transaction.commit()
-        if cachesize !="":
-            sql="set  global key_buffer_size="+cachesize+';'
+            try:
+                cursor.execute(sql)
+                transaction.commit()
+                messages.success(request, "修改成功！")
+            except Exception as e:
+                traceback.print_exc(e)
+        if cachesize != "":
+            sql = "set  global key_buffer_size="+cachesize+';'
             cursor = connection.cursor()
-            cursor.execute(sql)
-            transaction.commit()
+            try:
+                cursor.execute(sql)
+                transaction.commit()
+                messages.success(request, "修改成功！")
+            except Exception as e:
+                traceback.print_exc(e)
     return render(request, 'login/conmanage.html', locals())
 
 

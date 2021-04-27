@@ -1,24 +1,28 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>information</title>
+    <link href="{% static 'login/css/cate2.css' %}" rel="stylesheet"/>
 </head>
 <body>
-<div>数据库配置如下：</div>
-<table border="1">
-    <tr>
-        <th>Variable</th>
-        <th>Value</th>
-    </tr>
-    <ul>
-        {% for i,j in var_map.items %}
-            <tr>
-                <td>{{ i }}</td>
-                <td>{{ j }}</td>
-            </tr>
-        {% endfor %}
-    </ul>
-</table>
+<div class="wrapper">
+    <div class="title">数据库配置如下：</div>
+    <table border="1">
+        <tr>
+            <th>Variable</th>
+            <th>Value</th>
+        </tr>
+        <ul>
+            {% for i,j in var_map.items %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>{{ j }}</td>
+                </tr>
+            {% endfor %}
+        </ul>
+    </table>
+</div>
 </body>
 </html>

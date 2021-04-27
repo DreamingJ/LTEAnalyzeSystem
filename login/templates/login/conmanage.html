@@ -13,11 +13,18 @@
 
 </head>
 <body>
+
 <div class="container">
     <div id="header">LTE网络干扰分析系统
         <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;连接管理</div>
     </div>
-
+    {% if messages %}
+        <script>
+            {% for msg in messages %}
+                alert('{{ msg.message }}');
+            {% endfor %}
+        </script>
+    {% endif %}
     <div class="parent-wrapper">
 
         <div class="wrapper">
@@ -60,7 +67,7 @@
             </div>
         </div>
         <div class="iframe">
-            <iframe src="initframe/" id="iframe_info" width="600" height="550" frameborder="1"></iframe>
+            <iframe src="initframe/" id="iframe_info" width="620" height="550" frameborder="1"></iframe>
         </div>
     </div>
 </div>
