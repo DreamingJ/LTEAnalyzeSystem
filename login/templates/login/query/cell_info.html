@@ -1,0 +1,64 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- 上述meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'login/css/cell_info.css' %}" rel="stylesheet"/>
+    <title>LTE网络干扰分析系统-业务查询</title>
+
+</head>
+<body>
+
+<div class="container">
+    <div id="header">LTE网络干扰分析系统
+    </div>
+    <div class="sub-header">小区配置项信息查询</div>
+{#    <div class="parent-wrapper">#}
+        <div class="wrapper">
+            <div class="textbox">
+                <form class="param" action="/cell/" method="post">
+                    {% csrf_token %}
+                    <label>小区ID</label>
+                    <input type="text" name="cellid" id="cellid">
+                    <label>小区名称</label>
+                    <input type="text" name="cellname" id="cellname"><br>
+                    <div class="button">
+                        <button type="submit" class="btn btn-primary float-right">查询</button>
+                    </div>
+                </form>
+            </div>
+            <div class="selectbox">
+                <form class="param" action="/cell/" method="post">
+                    {% csrf_token %}
+                    <label>选择小区名称</label>
+                    <select name="table">
+                        <option value="cell1">cell1</option>
+                        <option value="cell2">cell2</option>
+                        <option value="cell3">cell3</option>
+                        <option value="cell4">cell4</option>
+                    </select>
+                    <div class="button">
+                        <button type="submit" class="btn btn-primary float-right">查询</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+{#    </div>#}
+</div>
+
+
+<div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+{#    以下三者的引用顺序是固定的#}
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.15.0/umd/popper.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

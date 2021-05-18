@@ -8,53 +8,50 @@
     <!-- 上述meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <!-- Bootstrap CSS -->
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'login/css/manager.css' %}" rel="stylesheet"/>
-    <title>LTE网络干扰分析系统</title>
+    <link href="{% static 'login/css/info_query.css' %}" rel="stylesheet"/>
+    <title>LTE网络干扰分析系统-业务查询</title>
 
 </head>
 <body>
 <div class="container">
-    <div id="header">LTE网络干扰分析系统</div>
-    <div id="welcome">
-        管理员{{ request.session.admin_name }}!欢迎！
-        <a href="/adminlogout/">退出登录</a>
+    <div id="header">LTE网络干扰分析系统
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业务查询</div>
     </div>
+
     <div class="col">
         {% csrf_token %}
 
-        <div class="title">功能菜单</div>
+{#        <div class="title">业务查询</div>#}
+        <div id="sub-header">请选择您要查询的业务</div>
         <div class="login-wrapper">
             <div class="userManage">
-                <a href="/admin/login/user/">
-                    <button type="button" class="btn btn-primary float-right">用户管理
+                <a href="/infoquery/cell/">
+                    <button type="button" class="btn btn-primary float-right">小区配置信息查询
                     </button>
                 </a>
             </div>
 
             <div class="connectManage">
-                <a href="/conmanage/">
-                    <button type="button" class="btn btn-primary float-right">连接管理
+                <a href="/infoquery/enodeb/">
+                    <button type="button" class="btn btn-primary float-right">基站eNodeB信息查询
                     </button>
                 </a>
             </div>
+        </div>
+        <div class="login-wrapper">
             <div class="dataManage">
-                <a href="/datamanage/">
-                    <button type="button" class="btn btn-primary float-right">数据管理
+                <a href="/infoquery/kpi/">
+                    <button type="button" class="btn btn-primary float-right">小区KPI指标信息查询
                     </button>
                 </a>
             </div>
             <div class="business1">
-                <a href="/infoquery/">
-                    <button type="button" class="btn btn-primary float-right">业务查询
+                <a href="/infoquery/prb/">
+                    <button type="button" class="btn btn-primary float-right">PRB信息统计与查询
                     </button>
                 </a>
             </div>
-            <div class="business2">
-                <a href="/analyze/">
-                    <button type="button" class="btn btn-primary float-right">业务分析
-                    </button>
-                </a>
-            </div>
+        </div>
         </div>
     </div>
 </div> <!-- /container -->

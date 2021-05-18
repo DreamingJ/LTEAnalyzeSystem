@@ -238,13 +238,16 @@ def importdata(request):
                                 # 解决主键重复问题，多字段主键
                                 if row[0] != '' and row[2] != '' and row[3] != '':
                                     date_pre = time.strptime(row[0], "%m/%d/%Y %H:%M:%S")
-                                    line = models.Tbkpi(date=time.strftime("%Y-%m-%d %H:%M:%S", date_pre),  # 读入是str，日期格式转换
+                                    line = models.Tbkpi(date=time.strftime("%Y-%m-%d %H:%M:%S", date_pre),
+                                                        # 读入是str，日期格式转换
                                                         enodeb_name=row[1],
                                                         sector=row[2],
                                                         sector_name=row[3],
                                                         rpc_establish=int(row[4]),
                                                         rpc_request=int(row[5]),
-                                                        rpc_succrate=None if row[5] == 0 or isinstance(row[5], str) or isinstance(row[6], str) else float(row[4]) / float(row[5]),
+                                                        rpc_succrate=None if row[5] == 0 or isinstance(row[5],
+                                                                                                       str) or isinstance(
+                                                            row[6], str) else float(row[4]) / float(row[5]),
                                                         erab_succ=int(row[7]),
                                                         erab_att=int(row[8]),
                                                         erab_succrate=float(row[9]),
@@ -264,11 +267,16 @@ def importdata(request):
                                                         enodeb_out_diff_att=int(row[23]),
                                                         enodeb_out_same_succ=int(row[24]),
                                                         enodeb_out_same_att=int(row[25]),
-                                                        enodeb_in_succrate=float(row[26]) if not isinstance(row[26], str) else None,
-                                                        enodeb_out_succrate=float(row[27]) if not isinstance(row[27], str) else None,
-                                                        enodeb_same_succrate=float(row[28]) if not isinstance(row[28], str) else None,
-                                                        enodeb_diff_succrate=float(row[29]) if not isinstance(row[29], str) else None,
-                                                        enodeb_switch_succrate=float(row[30]) if not isinstance(row[30], str) else None,
+                                                        enodeb_in_succrate=float(row[26]) if not isinstance(row[26],
+                                                                                                            str) else None,
+                                                        enodeb_out_succrate=float(row[27]) if not isinstance(row[27],
+                                                                                                             str) else None,
+                                                        enodeb_same_succrate=float(row[28]) if not isinstance(row[28],
+                                                                                                              str) else None,
+                                                        enodeb_diff_succrate=float(row[29]) if not isinstance(row[29],
+                                                                                                              str) else None,
+                                                        enodeb_switch_succrate=float(row[30]) if not isinstance(row[30],
+                                                                                                                str) else None,
                                                         pdcp_up=int(row[31]),
                                                         pdcp_down=int(row[32]),
                                                         rpc_rebuild=int(row[33]),
@@ -560,3 +568,36 @@ def infocate3(request):
     for var in Variable.objects.raw("show global variables like 'key_buffer_size';"):
         key_buffer_size = var.Value
     return render(request, 'login/info/cate3.html', locals())
+
+
+'''业务查询功能'''
+
+
+def info_query(request):
+    return render(request, 'login/query/info_query.html', locals())
+
+
+# show information of cell settings
+def cell_info(request):
+    if request.method == "POST":
+        pass
+    # TODO 过滤出所有小区名，并传递给前端
+    return render(request, 'login/query/cell_info.html', locals())
+
+
+def enodeb_info(request):
+    if request.method == "POST":
+        pass
+    return render(request, 'login/query/enodeb_info.html', locals())
+
+
+def kpi_info(request):
+    if request.method == "POST":
+        pass
+    return render(request, 'login/query/kpi_info.html', locals())
+
+
+def prb_info(request):
+    if request.method == "POST":
+        pass
+    return render(request, 'login/query/prb_info.html', locals())

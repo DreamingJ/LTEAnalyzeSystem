@@ -276,7 +276,7 @@ class Tbhandover(models.Model):
 
 # 用到， 无主键外键，需修改
 class Tbkpi(models.Model):
-    date = models.DateField(db_column='Date')  # Field name made lowercase.
+    date = models.DateTimeField(db_column='Date')  # Field name made lowercase.
     enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
     enodeb_name = models.ForeignKey('Tbcell', on_delete=models.CASCADE, to_field=Tbcell.enodeb_name,
                                     db_column='ENODEB_NAME')

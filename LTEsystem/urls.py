@@ -36,4 +36,9 @@ urlpatterns = [
     path('conmanage/cate1/', views.infocate1),
     path('conmanage/cate2/', views.infocate2),
     path('conmanage/cate3/', views.infocate3),
+    path('infoquery/', views.info_query),
+    path('infoquery/cell/', views.cell_info),
+    path('infoquery/enodeb/', views.enodeb_info),
+    path('infoquery/kpi/', views.kpi_info),
+    path('infoquery/prb/', views.prb_info),
 ]

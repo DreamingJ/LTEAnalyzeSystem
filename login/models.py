@@ -51,7 +51,7 @@ class Tbcell(models.Model):
 
 
 class Tbkpi(models.Model):
-    date = models.DateField(db_column='Date', blank=True, null=True)  # Field name made lowercase.
+    date = models.DateTimeField(db_column='Date', blank=True, null=True)  # Field name made lowercase.
     enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
     # enodeb_name = models.ForeignKey('Tbcell', on_delete=models.CASCADE, to_field=Tbcell.enodeb_name,
     #                                 db_column='ENODEB_NAME')
@@ -126,7 +126,7 @@ class Tbkpi(models.Model):
 
 
 class Tbprb(models.Model):
-    date = models.DateField(db_column='Date')  # Field name made lowercase.
+    date = models.DateTimeField(db_column='Date')  # Field name made lowercase.
     enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
     # enodeb_name = models.ForeignKey(Tbcell, on_delete=models.CASCADE,
     #                                 db_column='ENODEB_NAME')  # Field name made lowercase.
@@ -240,9 +240,9 @@ class Tbprb(models.Model):
 
 
 class Tbmrodata(models.Model):
-    timestamp = models.CharField(db_column='TimeStamp', primary_key=True, max_length=30)  # Field name made lowercase.
-    servingsector = models.CharField(db_column='ServingSector', max_length=50)  # Field name made lowercase.
-    interferingsector = models.CharField(db_column='InterferingSector', max_length=50)  # Field name made lowercase.
+    timestamp = models.CharField(db_column='TimeStamp', max_length=30)  # Field name made lowercase.
+    servingsector = models.CharField(db_column='ServingSector', max_length=30)  # Field name made lowercase.
+    interferingsector = models.CharField(db_column='InterferingSector', max_length=30)  # Field name made lowercase.
     ltescrsrp = models.FloatField(db_column='LteScRSRP', blank=True, null=True)  # Field name made lowercase.
     ltencrsrp = models.FloatField(db_column='LteNcRSRP', blank=True, null=True)  # Field name made lowercase.
     ltencearfcn = models.IntegerField(db_column='LteNcEarfcn', blank=True, null=True)  # Field name made lowercase.
