@@ -51,6 +51,7 @@ class Tbcell(models.Model):
 
 
 class Tbkpi(models.Model):
+    # 注意数据库里是sector_name和date联合主键，而model由于django限制只有一个
     date = models.DateTimeField(db_column='Date', blank=True, null=True)  # Field name made lowercase.
     enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
     # enodeb_name = models.ForeignKey('Tbcell', on_delete=models.CASCADE, to_field=Tbcell.enodeb_name,

@@ -12,7 +12,7 @@ from . import models, forms
 import hashlib
 import xlrd
 import xlwt
-from datetime import datetime
+import logging
 
 
 # Create your views here.
@@ -165,11 +165,9 @@ def datamanage(request):
 
 def importdata(request):
     # TODO 导入进度条
-    once_row = 100  # 每次读取行数，可修改
-    earfcn_list = [37900, 38098, 38400, 38496, 38544, 38950, 39148]
-    pci_list = [x for x in range(504)]
-    vendor_list = ['华为', '中兴', '诺西', '爱立信', '贝尔', '大唐']
-    style_list = ['室分', '宏站']
+    # TODO 加入判断是否已存在然后覆盖的逻辑后，插入时间大大增加，1s变为45s
+    logging.basicConfig(filename='import_data.log', filemode='w', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    once_row = 300  # 每次读取行数，可修改
     if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
         return redirect('/login/')
     if request.method == 'POST':
@@ -182,6 +180,10 @@ def importdata(request):
             message = '导入成功！'
             # 哪张目的表
             if request.POST['table'] == 'tbcell':
+                earfcn_list = [37900, 38098, 38400, 38496, 38544, 38950, 39148]
+                pci_list = [x for x in range(504)]
+                vendor_list = ['华为', '中兴', '诺西', '爱立信', '贝尔', '大唐']
+                style_list = ['室分', '宏站']
                 try:
                     with transaction.atomic():
                         cur_row = 1  # 跳过表头，只读数据
@@ -190,14 +192,12 @@ def importdata(request):
                             row_list = []  # 使用行列表批量插入
                             while cnt < once_row and cur_row < nrows:
                                 row = table.row_values(cur_row)  # 表的一行数据
-                                # 数据清洗
                                 if row[5] in earfcn_list and row[6] in pci_list and row[10] in vendor_list \
                                         and -180.00000 <= float(row[11]) <= 180.00000 and -90.00000 <= float(
                                     row[12]) <= 90.00000 and row[13] in style_list and not isinstance(row[18], str) \
-                                        and row[18] == row[16] + row[17]:
-                                    # if models.Tbcell.objects.filter(sector_id=row[1]):
-                                    #     # 数据已存在，先删除原数据
-                                    #     models.Tbcell.objects.filter(sector_id=row[1]).delete()
+                                        and row[18] == row[16] + row[17]:   # 数据清洗
+                                    if models.Tbcell.objects.filter(sector_id=row[1]).count() != 0:   # 数据已存在，用新数据覆盖原数据
+                                        models.Tbcell.objects.filter(sector_id=row[1]).delete()
                                     line = models.Tbcell(city=row[0],
                                                          sector_id=row[1],
                                                          sector_name=row[2],
@@ -217,15 +217,14 @@ def importdata(request):
                                                          totletilt=row[18])
                                     row_list.append(line)
                                 else:
-                                    pass
+                                    logging.info("File( %s ) [line %d] is not qualified.", f.name, cur_row)
                                     # 日志文件记录被剔除数据的位置、编号
                                 cnt += 1
                                 cur_row += 1
                             models.Tbcell.objects.bulk_create(row_list)  # 批量导入一个list
                 except Exception as e:
-                    print(e.args)
+                    logging.exception(e)
                     message = '导入有误！请查看日志文件'
-                    # 尚需加入logging模块
             elif request.POST['table'] == 'tbkpi':
                 try:
                     with transaction.atomic():
@@ -235,11 +234,12 @@ def importdata(request):
                             row_list = []
                             while cnt < once_row and cur_row < nrows:
                                 row = table.row_values(cur_row)
-                                # 解决主键重复问题，多字段主键
                                 if row[0] != '' and row[2] != '' and row[3] != '':
                                     date_pre = time.strptime(row[0], "%m/%d/%Y %H:%M:%S")
-                                    line = models.Tbkpi(date=time.strftime("%Y-%m-%d %H:%M:%S", date_pre),
-                                                        # 读入是str，日期格式转换
+                                    date_insert = time.strftime("%Y-%m-%d %H:%M:%S", date_pre)
+                                    if models.Tbkpi.objects.filter(date=date_insert, sector_name=row[3]).count() != 0:   # 数据已存在，用新数据覆盖原数据
+                                        models.Tbkpi.objects.filter(date=date_insert, sector_name=row[3]).delete()
+                                    line = models.Tbkpi(date=date_insert,   # 读入是str，日期格式转换
                                                         enodeb_name=row[1],
                                                         sector=row[2],
                                                         sector_name=row[3],
@@ -289,12 +289,13 @@ def importdata(request):
                                                         eno_in_request=int(row[40]))
                                     row_list.append(line)
                                 else:
-                                    pass
+                                    logging.info("File( %s ) [line %d] is not qualified.", f.name, cur_row)
                                 cnt += 1
                                 cur_row += 1
                             models.Tbkpi.objects.bulk_create(row_list)
                 except Exception as e:
                     print(e.args)
+                    logging.exception(e)
                     message = '导入有误！请查看日志文件'
             #         TODO  大表不要一次性读入内存磁盘
             elif request.POST['table'] == 'tbprb':
@@ -420,7 +421,7 @@ def importdata(request):
                                 cur_row += 1
                             models.Tbprb.objects.bulk_create(row_list)
                 except Exception as e:
-                    print(e.args)
+                    logging.exception(e)
                     message = '导入有误！请查看日志文件'
             elif request.POST['table'] == 'tbmrodata':
                 try:
@@ -446,11 +447,11 @@ def importdata(request):
                                 cur_row += 1
                             models.Tbmrodata.objects.bulk_create(row_list)
                 except Exception as e:
-                    print(e.args)
+                    logging.exception(e)
                     message = '导入有误！请查看日志文件'
         elif filetype == 'csv':
             pass
-        # TODO 跳转地址需要回到父目录
+        # TODO 导入中，增加进度条，跳转地址需要回到父目录
         return render(request, 'login/datamanage.html', {'message': message})
     return render(request, 'login/datamanage.html')
 
