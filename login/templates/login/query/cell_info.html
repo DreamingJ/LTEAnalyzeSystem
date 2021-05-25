@@ -52,40 +52,43 @@
         </div>
     </div>
     {#border="1" cellspacing="2" cellpadding="4" bgcolor="#ffffff" class="table" align="center"#}
-    <table border="1" cellspacing="2" cellpadding="2" bgcolor="#ffffff" class="table">
-        <thead>
-        <tr>
-            <th>CITY</th>
-            <th>SECTOR_ID</th>
-            <th>SECTOR_NAME</th>
-            <th>ENODEBID</th>
-            <th>ENODEB_NAME</th>
-            <th>EARFCN</th>
-            <th>PCI</th>
-            <th>PSS</th>
-            <th>SSS</th>
-            <th>TAC</th>
-            <th>VENDOR</th>
-            <th>LONGITUDE</th>
-            <th>LATITUDE</th>
-            <th>STYLE</th>
-            <th>AZIMUTH</th>
-            <th>HEIGHT</th>
-            <th>ELECTTILT</th>
-            <th>MECHTILT</th>
-            <th>TOTLETILT</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for dict in cell_dict %}
+    <div class="table-container">
+        <table cellspacing="2" cellpadding="2" bgcolor="#ffffff" class="table">
+            <thead>
             <tr>
-                {% for key,val in dict.items %}
-                    <td>{{ val }}</td>
-                {% endfor %}
+                <th>CITY</th>
+                <th>SECTOR_ID</th>
+                <th id="secName">SECTOR_NAME</th>
+                <th>ENODEBID</th>
+                <th>ENODEB_NAME</th>
+                <th>EARFCN</th>
+                <th>PCI</th>
+                <th>PSS</th>
+                <th>SSS</th>
+                <th>TAC</th>
+                <th>VENDOR</th>
+                <th>LONGITUDE</th>
+                <th>LATITUDE</th>
+                <th>STYLE</th>
+                <th>AZIMUTH</th>
+                <th>HEIGHT</th>
+                <th>ELECTTILT</th>
+                <th>MECHTILT</th>
+                <th>TOTLETILT</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for dict in cell_dict %}
+                <tr>
+                    {% for key,val in dict.items %}
+                        <td>{{ val }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 

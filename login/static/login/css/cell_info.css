@@ -28,7 +28,7 @@ body {
 .wrapper {
     display: flex;
     flex-direction: row;
-    width:900px;
+    width: 900px;
     justify-content: space-between;
     margin-top: 20px;
 }
@@ -81,6 +81,34 @@ body {
     margin: 0 20px 20px;
 }
 
-.table{
+.table-container {
+    max-width: 90vw;
+    overflow-x: auto;
+    border: 2px solid #888;
+    border-radius: 4px;
+    background-color: #b3d7ff;
+        margin-top: 40px;
+}
 
+/*.table-container::-webkit-scrollbar {*/
+/*    display: none;*/
+/*}*/
+
+.table {
+    font-size: 13px;
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+    background-color: transparent;
+    margin: 16px 20px;
+}
+
+.table td {
+    text-align: center;
+}
+
+.table th {
+    text-align: center;
+}
+
+#secName {
+    min-width: 130px;
 }
