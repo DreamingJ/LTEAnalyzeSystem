@@ -1,1 +1,11 @@
-2021-05-22 21:37:53,617 - INFO - E:\Pycharm_projects\djangoProject\LTEsystem\login\views.py changed, reloading.
+2021-05-23 12:26:09,980 - INFO - File( 9. tbMROData.csv ) [line 875606] is not qualified.
+2021-05-23 12:26:14,605 - ERROR - Internal Server Error: /datamanage/import
+Traceback (most recent call last):
+  File "C:\Users\¿ÂÎ÷\AppData\Local\Programs\Python\Python38-32\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
+    response = get_response(request)
+  File "C:\Users\¿ÂÎ÷\AppData\Local\Programs\Python\Python38-32\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "E:\Pycharm_projects\djangoProject\LTEsystem\login\views.py", line 458, in importdata
+    return render(request, 'login/datamanage.html', {'message': message})
+UnboundLocalError: local variable 'message' referenced before assignment
+2021-05-23 12:30:58,856 - INFO - E:\Pycharm_projects\djangoProject\LTEsystem\login\views.py changed, reloading.

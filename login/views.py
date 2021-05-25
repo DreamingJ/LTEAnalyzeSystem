@@ -165,7 +165,7 @@ def datamanage(request):
 
 def importdata(request):
     # TODO 导入进度条
-    # TODO 加入判断是否已存在然后覆盖的逻辑后，插入时间大大增加，1s变为45s
+    # TODO filter很慢，加入判断是否已存在然后覆盖的逻辑后，插入时间大大增加，1s变为45s
     logging.basicConfig(filename='import_data.log', filemode='w', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     once_row = 300  # 每次读取行数，可修改
     if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
@@ -178,7 +178,6 @@ def importdata(request):
             table = wb.sheets()[0]  # 获取sheet1
             nrows = table.nrows  # 总行数
             message = '导入成功！'
-            # 哪张目的表
             if request.POST['table'] == 'tbcell':
                 earfcn_list = [37900, 38098, 38400, 38496, 38544, 38950, 39148]
                 pci_list = [x for x in range(504)]
@@ -224,7 +223,7 @@ def importdata(request):
                             models.Tbcell.objects.bulk_create(row_list)  # 批量导入一个list
                 except Exception as e:
                     logging.exception(e)
-                    message = '导入有误！请查看日志文件'
+                    message = '导入有误！请检查源表格式是否正确'
             elif request.POST['table'] == 'tbkpi':
                 try:
                     with transaction.atomic():
@@ -296,11 +295,9 @@ def importdata(request):
                 except Exception as e:
                     print(e.args)
                     logging.exception(e)
-                    message = '导入有误！请查看日志文件'
-            #         TODO  大表不要一次性读入内存磁盘
+                    message = '导入有误！请检查源表格式是否正确'
             elif request.POST['table'] == 'tbprb':
                 try:
-                    once_row = 1000
                     with transaction.atomic():
                         cur_row = 1
                         while cur_row < nrows:
@@ -309,8 +306,9 @@ def importdata(request):
                             while cnt < once_row and cur_row < nrows:
                                 row = table.row_values(cur_row)
                                 date_pre = time.strptime(row[0], "%m/%d/%Y %H:%M:%S")
+                                date_insert = time.strftime("%Y-%m-%d %H:%M:%S", date_pre)
                                 if row[0] != '' and row[3] != '':
-                                    line = models.Tbprb(time.strftime("%Y-%m-%d %H:%M:%S", date_pre),
+                                    line = models.Tbprb(date=date_insert,
                                                         enodeb_name=row[1],
                                                         sector_description=row[2],
                                                         sector_name=row[3],
@@ -416,41 +414,47 @@ def importdata(request):
                                                         avr_noise_prb99=int(row[103]))
                                     row_list.append(line)
                                 else:
-                                    pass
+                                    logging.info("File( %s ) [line %d] is not qualified.", f.name, cur_row)
                                 cnt += 1
                                 cur_row += 1
                             models.Tbprb.objects.bulk_create(row_list)
                 except Exception as e:
                     logging.exception(e)
-                    message = '导入有误！请查看日志文件'
-            elif request.POST['table'] == 'tbmrodata':
+                    message = '导入有误！请检查源表格式是否正确'
+        elif filetype == 'csv':
+            f_csv = f.read().decode("utf-8")
+            if request.POST['table'] == 'tbmrodata':
+                # reader = csv.reader(f_csv)
+                lines = f_csv.split("\r\n")
                 try:
                     with transaction.atomic():
-                        cur_row = 1
-                        while cur_row < nrows:
-                            cnt = 0
-                            row_list = []
-                            while cnt < once_row and cur_row < nrows:
-                                row = table.row_values(cur_row)
-                                if True:
-                                    line = models.Tbmrodata(TimeStamp=row[0],
-                                                            ServingSector=row[1],
-                                                            InterferingSector=row[2],
-                                                            LteScRSRP=float(row[3]),
-                                                            LteNcRSRP=float(row[4]),
-                                                            LteNcEarfcn=int(row[5]),
-                                                            LteNcPci=int(row[6]))
-                                    row_list.append(line)
-                                else:
-                                    pass
-                                cnt += 1
-                                cur_row += 1
-                            models.Tbmrodata.objects.bulk_create(row_list)
+                        once_row = 5000
+                        row_list = []
+                        for index, line in enumerate(lines):
+                            row = line.split(",")
+                            if index == 0:
+                                continue
+                            if index % once_row == 0:    # 批量插入
+                                models.Tbmrodata.objects.bulk_create(row_list)
+                                row_list = []
+                            if row[0] != '' and row[1] != '' and row[2] != '':
+                                line_in = models.Tbmrodata(timestamp=row[0],
+                                                        servingsector=row[1],
+                                                        interferingsector=row[2],
+                                                        ltescrsrp=float(row[3]),
+                                                        ltencrsrp=float(row[4]),
+                                                        ltencearfcn=int(row[5]),
+                                                        ltencpci=int(row[6]))
+                                row_list.append(line_in)
+                            else:
+                                logging.info("File( %s ) [line %d] is not qualified.", f.name, index+1)
+                        models.Tbmrodata.objects.bulk_create(row_list)  # 最后剩余数据
+                        message = '导入成功！'
                 except Exception as e:
                     logging.exception(e)
-                    message = '导入有误！请查看日志文件'
-        elif filetype == 'csv':
-            pass
+                    message = '导入有误！请检查源表格式是否正确'
+            else:
+                message = '请检查导入目的表是否相符'
         # TODO 导入中，增加进度条，跳转地址需要回到父目录
         return render(request, 'login/datamanage.html', {'message': message})
     return render(request, 'login/datamanage.html')

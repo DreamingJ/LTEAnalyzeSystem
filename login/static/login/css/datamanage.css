@@ -44,6 +44,8 @@ body {
 
 .form-import {
     margin-left: 160px;
+    display: flex;
+    flex-direction: column;
 }
 
 .col-right {
