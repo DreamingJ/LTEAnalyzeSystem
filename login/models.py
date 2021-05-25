@@ -252,3 +252,17 @@ class Tbmrodata(models.Model):
     class Meta:
         managed = True
         db_table = 'tbmrodata'
+
+
+class TbC2Inew(models.Model):
+    nc_sector_id = models.CharField(db_column='NC_SECTOR_ID', max_length=50)  # Field name made lowercase.
+    sc_sector_id = models.CharField(db_column='SC_SECTOR_ID', max_length=50)  # Field name made lowercase.
+    rsrp_avg = models.FloatField(db_column='RSRP_AVG', blank=True, null=True)  # Field name made lowercase.
+    rsrp_std = models.FloatField(db_column='RSRP_STD', blank=True, null=True)  # Field name made lowercase.
+    probility_9 = models.FloatField(db_column='PROBILITY_9', blank=True, null=True)  # Field name made lowercase.
+    probility_6 = models.FloatField(db_column='PROBILITY_6', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = True
+        db_table = 'tbC2Inew'
+

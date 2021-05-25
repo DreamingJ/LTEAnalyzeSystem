@@ -7,7 +7,6 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
-# 自动生成的模板类，一个备份，调有用的放入login/models.py 会注释 用到
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)
@@ -140,6 +139,40 @@ class LoginUser(models.Model):
         db_table = 'login_user'
 
 
+class LoginVariable(models.Model):
+    variable_name = models.CharField(db_column='Variable_name', primary_key=True, max_length=128)  # Field name made lowercase.
+    value = models.IntegerField(db_column='Value')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'login_variable'
+
+
+class Tbc2Inew(models.Model):
+    nc_sector_id = models.CharField(db_column='NC_SECTOR_ID', max_length=50)  # Field name made lowercase.
+    sc_sector_id = models.CharField(db_column='SC_SECTOR_ID', max_length=50)  # Field name made lowercase.
+    rsrp_avg = models.FloatField(db_column='RSRP_AVG')  # Field name made lowercase.
+    rsrp_std = models.FloatField(db_column='RSRP_STD')  # Field name made lowercase.
+    probility_9 = models.FloatField(db_column='PROBILITY_9')  # Field name made lowercase.
+    probility_6 = models.FloatField(db_column='PROBILITY_6')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'tbC2Inew'
+
+
+class Tbadjcell(models.Model):
+    s_sector = models.OneToOneField('Tbcellcopy', models.DO_NOTHING, db_column='S_SECTOR_ID', primary_key=True)  # Field name made lowercase.
+    n_sector_id = models.CharField(db_column='N_SECTOR_ID', max_length=50)  # Field name made lowercase.
+    s_earfcn = models.IntegerField(db_column='S_EARFCN', blank=True, null=True)  # Field name made lowercase.
+    n_earfcn = models.IntegerField(db_column='N_EARFCN', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'tbadjcell'
+        unique_together = (('s_sector', 'n_sector_id'),)
+
+
 class Tbatuc2I(models.Model):
     sector_id = models.CharField(db_column='SECTOR_ID', primary_key=True, max_length=50)  # Field name made lowercase.
     ncell_id = models.CharField(db_column='NCELL_ID', max_length=50)  # Field name made lowercase.
@@ -154,8 +187,8 @@ class Tbatuc2I(models.Model):
 
 
 class Tbatudata(models.Model):
-    seq = models.BigIntegerField(blank=True, null=True)
-    filename = models.CharField(db_column='FileName', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    seq = models.BigIntegerField(primary_key=True)
+    filename = models.CharField(db_column='FileName', max_length=255)  # Field name made lowercase.
     time = models.CharField(db_column='Time', max_length=100, blank=True, null=True)  # Field name made lowercase.
     longitude = models.FloatField(db_column='Longitude', blank=True, null=True)  # Field name made lowercase.
     latitude = models.FloatField(db_column='Latitude', blank=True, null=True)  # Field name made lowercase.
@@ -193,6 +226,7 @@ class Tbatudata(models.Model):
     class Meta:
         managed = False
         db_table = 'tbatudata'
+        unique_together = (('seq', 'filename'),)
 
 
 class Tbatuhandover(models.Model):
@@ -212,7 +246,7 @@ class Tbc2I(models.Model):
     ncell = models.CharField(db_column='NCELL', max_length=255)  # Field name made lowercase.
     prc2i9 = models.FloatField(db_column='PrC2I9', blank=True, null=True)  # Field name made lowercase.
     c2i_mean = models.FloatField(db_column='C2I_Mean', blank=True, null=True)  # Field name made lowercase.
-    std = models.FloatField(blank=True, null=True)
+    std = models.FloatField(db_column='Std', blank=True, null=True)  # Field name made lowercase.
     samplecount = models.FloatField(db_column='SampleCount', blank=True, null=True)  # Field name made lowercase.
     weightedc2i = models.FloatField(db_column='WeightedC2I', blank=True, null=True)  # Field name made lowercase.
 
@@ -222,7 +256,6 @@ class Tbc2I(models.Model):
         unique_together = (('scell', 'ncell'),)
 
 
-# 用到
 class Tbcell(models.Model):
     city = models.CharField(db_column='CITY', max_length=255, blank=True, null=True)  # Field name made lowercase.
     sector_id = models.CharField(db_column='SECTOR_ID', primary_key=True, max_length=50)  # Field name made lowercase.
@@ -238,11 +271,11 @@ class Tbcell(models.Model):
     longitude = models.FloatField(db_column='LONGITUDE')  # Field name made lowercase.
     latitude = models.FloatField(db_column='LATITUDE')  # Field name made lowercase.
     style = models.CharField(db_column='STYLE', max_length=255, blank=True, null=True)  # Field name made lowercase.
-    azimuth = models.FloatField(db_column='AZIMUTH', blank=True, null=True)  # Field name made lowercase.
+    azimuth = models.FloatField(db_column='AZIMUTH')  # Field name made lowercase.
     height = models.FloatField(db_column='HEIGHT', blank=True, null=True)  # Field name made lowercase.
     electtilt = models.FloatField(db_column='ELECTTILT', blank=True, null=True)  # Field name made lowercase.
     mechtilt = models.FloatField(db_column='MECHTILT', blank=True, null=True)  # Field name made lowercase.
-    totletilt = models.FloatField(db_column='TOTLETILT', blank=True, null=True)  # Field name made lowercase.
+    totletilt = models.FloatField(db_column='TOTLETILT')  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -250,14 +283,41 @@ class Tbcell(models.Model):
 
 
 class TbcellTraffic(models.Model):
-    date = models.DateField(db_column='Date')  # Field name made lowercase.
-    hour = models.SmallIntegerField(db_column='Hour')  # Field name made lowercase.
-    sector_id = models.CharField(db_column='Sector_ID', max_length=255)  # Field name made lowercase.
-    traffic = models.FloatField(db_column='Traffic', blank=True, null=True)  # Field name made lowercase.
+    stadate = models.DateField(db_column='STADATE', primary_key=True)  # Field name made lowercase.
+    statime = models.SmallIntegerField(db_column='STATIME')  # Field name made lowercase.
+    sectorid = models.CharField(db_column='SECTORID', max_length=255)  # Field name made lowercase.
+    celltraffic = models.FloatField(db_column='CellTraffic', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'tbcell_traffic'
+        unique_together = (('stadate', 'statime', 'sectorid'),)
+
+
+class Tbcellcopy(models.Model):
+    city = models.CharField(db_column='CITY', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    sector_id = models.CharField(db_column='SECTOR_ID', primary_key=True, max_length=50)  # Field name made lowercase.
+    sector_name = models.CharField(db_column='SECTOR_NAME', max_length=255)  # Field name made lowercase.
+    enodebid = models.IntegerField(db_column='ENODEBID')  # Field name made lowercase.
+    enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
+    earfcn = models.IntegerField(db_column='EARFCN')  # Field name made lowercase.
+    pci = models.IntegerField(db_column='PCI')  # Field name made lowercase.
+    pss = models.IntegerField(db_column='PSS', blank=True, null=True)  # Field name made lowercase.
+    sss = models.IntegerField(db_column='SSS', blank=True, null=True)  # Field name made lowercase.
+    tac = models.IntegerField(db_column='TAC', blank=True, null=True)  # Field name made lowercase.
+    vendor = models.CharField(db_column='VENDOR', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    longitude = models.FloatField(db_column='LONGITUDE')  # Field name made lowercase.
+    latitude = models.FloatField(db_column='LATITUDE')  # Field name made lowercase.
+    style = models.CharField(db_column='STYLE', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    azimuth = models.FloatField(db_column='AZIMUTH')  # Field name made lowercase.
+    height = models.FloatField(db_column='HEIGHT', blank=True, null=True)  # Field name made lowercase.
+    electtilt = models.FloatField(db_column='ELECTTILT', blank=True, null=True)  # Field name made lowercase.
+    mechtilt = models.FloatField(db_column='MECHTILT', blank=True, null=True)  # Field name made lowercase.
+    totletilt = models.FloatField(db_column='TOTLETILT')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'tbcellcopy'
 
 
 class Tbhandover(models.Model):
@@ -274,62 +334,59 @@ class Tbhandover(models.Model):
         unique_together = (('scell', 'ncell'),)
 
 
-# 用到， 无主键外键，需修改
 class Tbkpi(models.Model):
     date = models.DateTimeField(db_column='Date')  # Field name made lowercase.
     enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
-    enodeb_name = models.ForeignKey('Tbcell', on_delete=models.CASCADE, to_field=Tbcell.enodeb_name,
-                                    db_column='ENODEB_NAME')
     sector = models.CharField(db_column='SECTOR', max_length=255)  # Field name made lowercase.
     sector_name = models.CharField(db_column='SECTOR_NAME', primary_key=True, max_length=255)  # Field name made lowercase.
-    rpc_establish = models.IntegerField(db_column='RPC_ESTABLISH')  # Field name made lowercase.
-    rpc_request = models.IntegerField(db_column='RPC_REQUEST')  # Field name made lowercase.
-    rpc_succrate = models.FloatField(db_column='RPC_SUCCRATE')  # Field name made lowercase.
-    erab_succ = models.IntegerField(db_column='ERAB_SUCC')  # Field name made lowercase.
-    erab_att = models.IntegerField(db_column='ERAB_ATT')  # Field name made lowercase.
-    erab_succrate = models.FloatField(db_column='ERAB_SUCCRATE')  # Field name made lowercase.
-    enodeb_erab_ex = models.IntegerField(db_column='ENODEB_ERAB_EX')  # Field name made lowercase.
-    sector_switch_erab_ex = models.IntegerField(db_column='SECTOR_SWITCH_ERAB_EX')  # Field name made lowercase.
-    erab_lossrate = models.FloatField(db_column='ERAB_LOSSRATE')  # Field name made lowercase.
-    ay = models.FloatField(db_column='AY')  # Field name made lowercase.
-    enodeb_reset_ue_release = models.IntegerField(db_column='ENODEB_RESET_UE_RELEASE')  # Field name made lowercase.
-    ue_ex_release = models.IntegerField(db_column='UE_EX_RELEASE')  # Field name made lowercase.
-    ue_succ = models.IntegerField(db_column='UE_SUCC')  # Field name made lowercase.
-    lossrate = models.FloatField(db_column='LOSSRATE')  # Field name made lowercase.
-    enodeb_in_diff_succ = models.IntegerField(db_column='ENODEB_IN_DIFF_SUCC')  # Field name made lowercase.
-    enodeb_in_diff_att = models.IntegerField(db_column='ENODEB_IN_DIFF_ATT')  # Field name made lowercase.
-    enodeb_in_same_succ = models.IntegerField(db_column='ENODEB_IN_SAME_SUCC')  # Field name made lowercase.
-    enodeb_in_same_att = models.IntegerField(db_column='ENODEB_IN_SAME_ATT')  # Field name made lowercase.
-    enodeb_out_diff_succ = models.IntegerField(db_column='ENODEB_OUT_DIFF_SUCC')  # Field name made lowercase.
-    enodeb_out_diff_att = models.IntegerField(db_column='ENODEB_OUT_DIFF_ATT')  # Field name made lowercase.
-    enodeb_out_same_succ = models.IntegerField(db_column='ENODEB_OUT_SAME_SUCC')  # Field name made lowercase.
-    enodeb_out_same_att = models.IntegerField(db_column='ENODEB_OUT_SAME_ATT')  # Field name made lowercase.
-    enodeb_in_succrate = models.FloatField(db_column='ENODEB_IN_SUCCRATE')  # Field name made lowercase.
-    enodeb_out_succrate = models.FloatField(db_column='ENODEB_OUT_SUCCRATE')  # Field name made lowercase.
-    enodeb_same_succrate = models.FloatField(db_column='ENODEB_SAME_SUCCRATE')  # Field name made lowercase.
-    enodeb_diff_succrate = models.FloatField(db_column='ENODEB_DIFF_SUCCRATE')  # Field name made lowercase.
-    enodeb_switch_succrate = models.FloatField(db_column='ENODEB_SWITCH_SUCCRATE')  # Field name made lowercase.
-    pdcp_up = models.IntegerField(db_column='PDCP_UP')  # Field name made lowercase.
-    pdcp_down = models.IntegerField(db_column='PDCP_DOWN')  # Field name made lowercase.
-    rpc_rebuild = models.IntegerField(db_column='RPC_REBUILD')  # Field name made lowercase.
-    rpc_rebuildrate = models.FloatField(db_column='RPC_REBUILDRATE')  # Field name made lowercase.
-    rebuild_enodeb_out_same_succ = models.IntegerField(db_column='REBUILD_ENODEB_OUT_SAME_SUCC')  # Field name made lowercase.
-    rebuild_enodeb_out_diff_succ = models.IntegerField(db_column='REBUILD_ENODEB_OUT_DIFF_SUCC')  # Field name made lowercase.
-    rebuild_enodeb_in_same_succ = models.IntegerField(db_column='REBUILD_ENODEB_IN_SAME_SUCC')  # Field name made lowercase.
-    rebuild_enodeb_in_diff_succ = models.IntegerField(db_column='REBUILD_ENODEB_IN_DIFF_SUCC')  # Field name made lowercase.
-    enb_in_succ = models.IntegerField(db_column='ENB_IN_SUCC')  # Field name made lowercase.
-    eno_in_request = models.IntegerField(db_column='ENO_IN_REQUEST')  # Field name made lowercase.
+    rpc_establish = models.IntegerField(db_column='RPC_ESTABLISH', blank=True, null=True)  # Field name made lowercase.
+    rpc_request = models.IntegerField(db_column='RPC_REQUEST', blank=True, null=True)  # Field name made lowercase.
+    rpc_succrate = models.FloatField(db_column='RPC_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    erab_succ = models.IntegerField(db_column='ERAB_SUCC', blank=True, null=True)  # Field name made lowercase.
+    erab_att = models.IntegerField(db_column='ERAB_ATT', blank=True, null=True)  # Field name made lowercase.
+    erab_succrate = models.FloatField(db_column='ERAB_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    enodeb_erab_ex = models.IntegerField(db_column='ENODEB_ERAB_EX', blank=True, null=True)  # Field name made lowercase.
+    sector_switch_erab_ex = models.IntegerField(db_column='SECTOR_SWITCH_ERAB_EX', blank=True, null=True)  # Field name made lowercase.
+    erab_lossrate = models.FloatField(db_column='ERAB_LOSSRATE', blank=True, null=True)  # Field name made lowercase.
+    ay = models.FloatField(db_column='AY', blank=True, null=True)  # Field name made lowercase.
+    enodeb_reset_ue_release = models.IntegerField(db_column='ENODEB_RESET_UE_RELEASE', blank=True, null=True)  # Field name made lowercase.
+    ue_ex_release = models.IntegerField(db_column='UE_EX_RELEASE', blank=True, null=True)  # Field name made lowercase.
+    ue_succ = models.IntegerField(db_column='UE_SUCC', blank=True, null=True)  # Field name made lowercase.
+    lossrate = models.FloatField(db_column='LOSSRATE', blank=True, null=True)  # Field name made lowercase.
+    enodeb_in_diff_succ = models.IntegerField(db_column='ENODEB_IN_DIFF_SUCC', blank=True, null=True)  # Field name made lowercase.
+    enodeb_in_diff_att = models.IntegerField(db_column='ENODEB_IN_DIFF_ATT', blank=True, null=True)  # Field name made lowercase.
+    enodeb_in_same_succ = models.IntegerField(db_column='ENODEB_IN_SAME_SUCC', blank=True, null=True)  # Field name made lowercase.
+    enodeb_in_same_att = models.IntegerField(db_column='ENODEB_IN_SAME_ATT', blank=True, null=True)  # Field name made lowercase.
+    enodeb_out_diff_succ = models.IntegerField(db_column='ENODEB_OUT_DIFF_SUCC', blank=True, null=True)  # Field name made lowercase.
+    enodeb_out_diff_att = models.IntegerField(db_column='ENODEB_OUT_DIFF_ATT', blank=True, null=True)  # Field name made lowercase.
+    enodeb_out_same_succ = models.IntegerField(db_column='ENODEB_OUT_SAME_SUCC', blank=True, null=True)  # Field name made lowercase.
+    enodeb_out_same_att = models.IntegerField(db_column='ENODEB_OUT_SAME_ATT', blank=True, null=True)  # Field name made lowercase.
+    enodeb_in_succrate = models.FloatField(db_column='ENODEB_IN_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    enodeb_out_succrate = models.FloatField(db_column='ENODEB_OUT_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    enodeb_same_succrate = models.FloatField(db_column='ENODEB_SAME_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    enodeb_diff_succrate = models.FloatField(db_column='ENODEB_DIFF_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    enodeb_switch_succrate = models.FloatField(db_column='ENODEB_SWITCH_SUCCRATE', blank=True, null=True)  # Field name made lowercase.
+    pdcp_up = models.BigIntegerField(db_column='PDCP_UP', blank=True, null=True)  # Field name made lowercase.
+    pdcp_down = models.BigIntegerField(db_column='PDCP_DOWN', blank=True, null=True)  # Field name made lowercase.
+    rpc_rebuild = models.IntegerField(db_column='RPC_REBUILD', blank=True, null=True)  # Field name made lowercase.
+    rpc_rebuildrate = models.FloatField(db_column='RPC_REBUILDRATE', blank=True, null=True)  # Field name made lowercase.
+    rebuild_enodeb_out_same_succ = models.IntegerField(db_column='REBUILD_ENODEB_OUT_SAME_SUCC', blank=True, null=True)  # Field name made lowercase.
+    rebuild_enodeb_out_diff_succ = models.IntegerField(db_column='REBUILD_ENODEB_OUT_DIFF_SUCC', blank=True, null=True)  # Field name made lowercase.
+    rebuild_enodeb_in_same_succ = models.IntegerField(db_column='REBUILD_ENODEB_IN_SAME_SUCC', blank=True, null=True)  # Field name made lowercase.
+    rebuild_enodeb_in_diff_succ = models.IntegerField(db_column='REBUILD_ENODEB_IN_DIFF_SUCC', blank=True, null=True)  # Field name made lowercase.
+    enb_in_succ = models.IntegerField(db_column='ENB_IN_SUCC', blank=True, null=True)  # Field name made lowercase.
+    eno_in_request = models.IntegerField(db_column='ENO_IN_REQUEST', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'tbkpi'
+        unique_together = (('sector_name', 'date'),)
 
 
-# 用到， 多属性主键，暂未解决
 class Tbmrodata(models.Model):
-    timestamp = models.CharField(db_column='TimeStamp', max_length=30, blank=True, null=True)  # Field name made lowercase.
-    servingsector = models.CharField(db_column='ServingSector', max_length=30, blank=True, null=True)  # Field name made lowercase.
-    interferingsector = models.CharField(db_column='InterferingSector', max_length=30, blank=True, null=True)  # Field name made lowercase.
+    timestamp = models.CharField(db_column='TimeStamp', max_length=30)  # Field name made lowercase.
+    servingsector = models.CharField(db_column='ServingSector', max_length=30)  # Field name made lowercase.
+    interferingsector = models.CharField(db_column='InterferingSector', max_length=30)  # Field name made lowercase.
     ltescrsrp = models.FloatField(db_column='LteScRSRP', blank=True, null=True)  # Field name made lowercase.
     ltencrsrp = models.FloatField(db_column='LteNcRSRP', blank=True, null=True)  # Field name made lowercase.
     ltencearfcn = models.IntegerField(db_column='LteNcEarfcn', blank=True, null=True)  # Field name made lowercase.
@@ -370,118 +427,116 @@ class Tbpciassignment(models.Model):
         unique_together = (('assign_id', 'sector_id'),)
 
 
-# 用到，修改主键外键
 class Tbprb(models.Model):
-    date = models.DateField(db_column='Date')  # Field name made lowercase.
+    date = models.DateTimeField(db_column='Date')  # Field name made lowercase.
     enodeb_name = models.CharField(db_column='ENODEB_NAME', max_length=255)  # Field name made lowercase.
-    enodeb_name = models.ForeignKey('Tbcell', on_delete=models.CASCADE, to_field=Tbcell.enodeb_name,
-                                    db_column='ENODEB_NAME')
     sector_description = models.CharField(db_column='SECTOR_DESCRIPTION', max_length=255)  # Field name made lowercase.
     sector_name = models.CharField(db_column='SECTOR_NAME', primary_key=True, max_length=255)  # Field name made lowercase.
-    avr_noise_prb0 = models.IntegerField(db_column='AVR_NOISE_PRB0')  # Field name made lowercase.
-    avr_noise_prb1 = models.IntegerField(db_column='AVR_NOISE_PRB1')  # Field name made lowercase.
-    avr_noise_prb2 = models.IntegerField(db_column='AVR_NOISE_PRB2')  # Field name made lowercase.
-    avr_noise_prb3 = models.IntegerField(db_column='AVR_NOISE_PRB3')  # Field name made lowercase.
-    avr_noise_prb4 = models.IntegerField(db_column='AVR_NOISE_PRB4')  # Field name made lowercase.
-    avr_noise_prb5 = models.IntegerField(db_column='AVR_NOISE_PRB5')  # Field name made lowercase.
-    avr_noise_prb6 = models.IntegerField(db_column='AVR_NOISE_PRB6')  # Field name made lowercase.
-    avr_noise_prb7 = models.IntegerField(db_column='AVR_NOISE_PRB7')  # Field name made lowercase.
-    avr_noise_prb8 = models.IntegerField(db_column='AVR_NOISE_PRB8')  # Field name made lowercase.
-    avr_noise_prb9 = models.IntegerField(db_column='AVR_NOISE_PRB9')  # Field name made lowercase.
-    avr_noise_prb10 = models.IntegerField(db_column='AVR_NOISE_PRB10')  # Field name made lowercase.
-    avr_noise_prb11 = models.IntegerField(db_column='AVR_NOISE_PRB11')  # Field name made lowercase.
-    avr_noise_prb12 = models.IntegerField(db_column='AVR_NOISE_PRB12')  # Field name made lowercase.
-    avr_noise_prb13 = models.IntegerField(db_column='AVR_NOISE_PRB13')  # Field name made lowercase.
-    avr_noise_prb14 = models.IntegerField(db_column='AVR_NOISE_PRB14')  # Field name made lowercase.
-    avr_noise_prb15 = models.IntegerField(db_column='AVR_NOISE_PRB15')  # Field name made lowercase.
-    avr_noise_prb16 = models.IntegerField(db_column='AVR_NOISE_PRB16')  # Field name made lowercase.
-    avr_noise_prb17 = models.IntegerField(db_column='AVR_NOISE_PRB17')  # Field name made lowercase.
-    avr_noise_prb18 = models.IntegerField(db_column='AVR_NOISE_PRB18')  # Field name made lowercase.
-    avr_noise_prb19 = models.IntegerField(db_column='AVR_NOISE_PRB19')  # Field name made lowercase.
-    avr_noise_prb20 = models.IntegerField(db_column='AVR_NOISE_PRB20')  # Field name made lowercase.
-    avr_noise_prb21 = models.IntegerField(db_column='AVR_NOISE_PRB21')  # Field name made lowercase.
-    avr_noise_prb22 = models.IntegerField(db_column='AVR_NOISE_PRB22')  # Field name made lowercase.
-    avr_noise_prb23 = models.IntegerField(db_column='AVR_NOISE_PRB23')  # Field name made lowercase.
-    avr_noise_prb24 = models.IntegerField(db_column='AVR_NOISE_PRB24')  # Field name made lowercase.
-    avr_noise_prb25 = models.IntegerField(db_column='AVR_NOISE_PRB25')  # Field name made lowercase.
-    avr_noise_prb26 = models.IntegerField(db_column='AVR_NOISE_PRB26')  # Field name made lowercase.
-    avr_noise_prb27 = models.IntegerField(db_column='AVR_NOISE_PRB27')  # Field name made lowercase.
-    avr_noise_prb28 = models.IntegerField(db_column='AVR_NOISE_PRB28')  # Field name made lowercase.
-    avr_noise_prb29 = models.IntegerField(db_column='AVR_NOISE_PRB29')  # Field name made lowercase.
-    avr_noise_prb30 = models.IntegerField(db_column='AVR_NOISE_PRB30')  # Field name made lowercase.
-    avr_noise_prb31 = models.IntegerField(db_column='AVR_NOISE_PRB31')  # Field name made lowercase.
-    avr_noise_prb32 = models.IntegerField(db_column='AVR_NOISE_PRB32')  # Field name made lowercase.
-    avr_noise_prb33 = models.IntegerField(db_column='AVR_NOISE_PRB33')  # Field name made lowercase.
-    avr_noise_prb34 = models.IntegerField(db_column='AVR_NOISE_PRB34')  # Field name made lowercase.
-    avr_noise_prb35 = models.IntegerField(db_column='AVR_NOISE_PRB35')  # Field name made lowercase.
-    avr_noise_prb36 = models.IntegerField(db_column='AVR_NOISE_PRB36')  # Field name made lowercase.
-    avr_noise_prb37 = models.IntegerField(db_column='AVR_NOISE_PRB37')  # Field name made lowercase.
-    avr_noise_prb38 = models.IntegerField(db_column='AVR_NOISE_PRB38')  # Field name made lowercase.
-    avr_noise_prb39 = models.IntegerField(db_column='AVR_NOISE_PRB39')  # Field name made lowercase.
-    avr_noise_prb40 = models.IntegerField(db_column='AVR_NOISE_PRB40')  # Field name made lowercase.
-    avr_noise_prb41 = models.IntegerField(db_column='AVR_NOISE_PRB41')  # Field name made lowercase.
-    avr_noise_prb42 = models.IntegerField(db_column='AVR_NOISE_PRB42')  # Field name made lowercase.
-    avr_noise_prb43 = models.IntegerField(db_column='AVR_NOISE_PRB43')  # Field name made lowercase.
-    avr_noise_prb44 = models.IntegerField(db_column='AVR_NOISE_PRB44')  # Field name made lowercase.
-    avr_noise_prb45 = models.IntegerField(db_column='AVR_NOISE_PRB45')  # Field name made lowercase.
-    avr_noise_prb46 = models.IntegerField(db_column='AVR_NOISE_PRB46')  # Field name made lowercase.
-    avr_noise_prb47 = models.IntegerField(db_column='AVR_NOISE_PRB47')  # Field name made lowercase.
-    avr_noise_prb48 = models.IntegerField(db_column='AVR_NOISE_PRB48')  # Field name made lowercase.
-    avr_noise_prb49 = models.IntegerField(db_column='AVR_NOISE_PRB49')  # Field name made lowercase.
-    avr_noise_prb50 = models.IntegerField(db_column='AVR_NOISE_PRB50')  # Field name made lowercase.
-    avr_noise_prb51 = models.IntegerField(db_column='AVR_NOISE_PRB51')  # Field name made lowercase.
-    avr_noise_prb52 = models.IntegerField(db_column='AVR_NOISE_PRB52')  # Field name made lowercase.
-    avr_noise_prb53 = models.IntegerField(db_column='AVR_NOISE_PRB53')  # Field name made lowercase.
-    avr_noise_prb54 = models.IntegerField(db_column='AVR_NOISE_PRB54')  # Field name made lowercase.
-    avr_noise_prb55 = models.IntegerField(db_column='AVR_NOISE_PRB55')  # Field name made lowercase.
-    avr_noise_prb56 = models.IntegerField(db_column='AVR_NOISE_PRB56')  # Field name made lowercase.
-    avr_noise_prb57 = models.IntegerField(db_column='AVR_NOISE_PRB57')  # Field name made lowercase.
-    avr_noise_prb58 = models.IntegerField(db_column='AVR_NOISE_PRB58')  # Field name made lowercase.
-    avr_noise_prb59 = models.IntegerField(db_column='AVR_NOISE_PRB59')  # Field name made lowercase.
-    avr_noise_prb60 = models.IntegerField(db_column='AVR_NOISE_PRB60')  # Field name made lowercase.
-    avr_noise_prb61 = models.IntegerField(db_column='AVR_NOISE_PRB61')  # Field name made lowercase.
-    avr_noise_prb62 = models.IntegerField(db_column='AVR_NOISE_PRB62')  # Field name made lowercase.
-    avr_noise_prb63 = models.IntegerField(db_column='AVR_NOISE_PRB63')  # Field name made lowercase.
-    avr_noise_prb64 = models.IntegerField(db_column='AVR_NOISE_PRB64')  # Field name made lowercase.
-    avr_noise_prb65 = models.IntegerField(db_column='AVR_NOISE_PRB65')  # Field name made lowercase.
-    avr_noise_prb66 = models.IntegerField(db_column='AVR_NOISE_PRB66')  # Field name made lowercase.
-    avr_noise_prb67 = models.IntegerField(db_column='AVR_NOISE_PRB67')  # Field name made lowercase.
-    avr_noise_prb68 = models.IntegerField(db_column='AVR_NOISE_PRB68')  # Field name made lowercase.
-    avr_noise_prb69 = models.IntegerField(db_column='AVR_NOISE_PRB69')  # Field name made lowercase.
-    avr_noise_prb70 = models.IntegerField(db_column='AVR_NOISE_PRB70')  # Field name made lowercase.
-    avr_noise_prb71 = models.IntegerField(db_column='AVR_NOISE_PRB71')  # Field name made lowercase.
-    avr_noise_prb72 = models.IntegerField(db_column='AVR_NOISE_PRB72')  # Field name made lowercase.
-    avr_noise_prb73 = models.IntegerField(db_column='AVR_NOISE_PRB73')  # Field name made lowercase.
-    avr_noise_prb74 = models.IntegerField(db_column='AVR_NOISE_PRB74')  # Field name made lowercase.
-    avr_noise_prb75 = models.IntegerField(db_column='AVR_NOISE_PRB75')  # Field name made lowercase.
-    avr_noise_prb76 = models.IntegerField(db_column='AVR_NOISE_PRB76')  # Field name made lowercase.
-    avr_noise_prb77 = models.IntegerField(db_column='AVR_NOISE_PRB77')  # Field name made lowercase.
-    avr_noise_prb78 = models.IntegerField(db_column='AVR_NOISE_PRB78')  # Field name made lowercase.
-    avr_noise_prb79 = models.IntegerField(db_column='AVR_NOISE_PRB79')  # Field name made lowercase.
-    avr_noise_prb80 = models.IntegerField(db_column='AVR_NOISE_PRB80')  # Field name made lowercase.
-    avr_noise_prb81 = models.IntegerField(db_column='AVR_NOISE_PRB81')  # Field name made lowercase.
-    avr_noise_prb82 = models.IntegerField(db_column='AVR_NOISE_PRB82')  # Field name made lowercase.
-    avr_noise_prb83 = models.IntegerField(db_column='AVR_NOISE_PRB83')  # Field name made lowercase.
-    avr_noise_prb84 = models.IntegerField(db_column='AVR_NOISE_PRB84')  # Field name made lowercase.
-    avr_noise_prb85 = models.IntegerField(db_column='AVR_NOISE_PRB85')  # Field name made lowercase.
-    avr_noise_prb86 = models.IntegerField(db_column='AVR_NOISE_PRB86')  # Field name made lowercase.
-    avr_noise_prb87 = models.IntegerField(db_column='AVR_NOISE_PRB87')  # Field name made lowercase.
-    avr_noise_prb88 = models.IntegerField(db_column='AVR_NOISE_PRB88')  # Field name made lowercase.
-    avr_noise_prb89 = models.IntegerField(db_column='AVR_NOISE_PRB89')  # Field name made lowercase.
-    avr_noise_prb90 = models.IntegerField(db_column='AVR_NOISE_PRB90')  # Field name made lowercase.
-    avr_noise_prb91 = models.IntegerField(db_column='AVR_NOISE_PRB91')  # Field name made lowercase.
-    avr_noise_prb92 = models.IntegerField(db_column='AVR_NOISE_PRB92')  # Field name made lowercase.
-    avr_noise_prb93 = models.IntegerField(db_column='AVR_NOISE_PRB93')  # Field name made lowercase.
-    avr_noise_prb94 = models.IntegerField(db_column='AVR_NOISE_PRB94')  # Field name made lowercase.
-    avr_noise_prb95 = models.IntegerField(db_column='AVR_NOISE_PRB95')  # Field name made lowercase.
-    avr_noise_prb96 = models.IntegerField(db_column='AVR_NOISE_PRB96')  # Field name made lowercase.
-    avr_noise_prb97 = models.IntegerField(db_column='AVR_NOISE_PRB97')  # Field name made lowercase.
-    avr_noise_prb98 = models.IntegerField(db_column='AVR_NOISE_PRB98')  # Field name made lowercase.
-    avr_noise_prb99 = models.IntegerField(db_column='AVR_NOISE_PRB99')  # Field name made lowercase.
+    avr_noise_prb0 = models.IntegerField(db_column='AVR_NOISE_PRB0', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb1 = models.IntegerField(db_column='AVR_NOISE_PRB1', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb2 = models.IntegerField(db_column='AVR_NOISE_PRB2', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb3 = models.IntegerField(db_column='AVR_NOISE_PRB3', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb4 = models.IntegerField(db_column='AVR_NOISE_PRB4', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb5 = models.IntegerField(db_column='AVR_NOISE_PRB5', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb6 = models.IntegerField(db_column='AVR_NOISE_PRB6', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb7 = models.IntegerField(db_column='AVR_NOISE_PRB7', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb8 = models.IntegerField(db_column='AVR_NOISE_PRB8', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb9 = models.IntegerField(db_column='AVR_NOISE_PRB9', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb10 = models.IntegerField(db_column='AVR_NOISE_PRB10', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb11 = models.IntegerField(db_column='AVR_NOISE_PRB11', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb12 = models.IntegerField(db_column='AVR_NOISE_PRB12', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb13 = models.IntegerField(db_column='AVR_NOISE_PRB13', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb14 = models.IntegerField(db_column='AVR_NOISE_PRB14', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb15 = models.IntegerField(db_column='AVR_NOISE_PRB15', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb16 = models.IntegerField(db_column='AVR_NOISE_PRB16', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb17 = models.IntegerField(db_column='AVR_NOISE_PRB17', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb18 = models.IntegerField(db_column='AVR_NOISE_PRB18', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb19 = models.IntegerField(db_column='AVR_NOISE_PRB19', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb20 = models.IntegerField(db_column='AVR_NOISE_PRB20', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb21 = models.IntegerField(db_column='AVR_NOISE_PRB21', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb22 = models.IntegerField(db_column='AVR_NOISE_PRB22', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb23 = models.IntegerField(db_column='AVR_NOISE_PRB23', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb24 = models.IntegerField(db_column='AVR_NOISE_PRB24', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb25 = models.IntegerField(db_column='AVR_NOISE_PRB25', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb26 = models.IntegerField(db_column='AVR_NOISE_PRB26', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb27 = models.IntegerField(db_column='AVR_NOISE_PRB27', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb28 = models.IntegerField(db_column='AVR_NOISE_PRB28', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb29 = models.IntegerField(db_column='AVR_NOISE_PRB29', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb30 = models.IntegerField(db_column='AVR_NOISE_PRB30', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb31 = models.IntegerField(db_column='AVR_NOISE_PRB31', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb32 = models.IntegerField(db_column='AVR_NOISE_PRB32', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb33 = models.IntegerField(db_column='AVR_NOISE_PRB33', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb34 = models.IntegerField(db_column='AVR_NOISE_PRB34', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb35 = models.IntegerField(db_column='AVR_NOISE_PRB35', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb36 = models.IntegerField(db_column='AVR_NOISE_PRB36', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb37 = models.IntegerField(db_column='AVR_NOISE_PRB37', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb38 = models.IntegerField(db_column='AVR_NOISE_PRB38', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb39 = models.IntegerField(db_column='AVR_NOISE_PRB39', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb40 = models.IntegerField(db_column='AVR_NOISE_PRB40', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb41 = models.IntegerField(db_column='AVR_NOISE_PRB41', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb42 = models.IntegerField(db_column='AVR_NOISE_PRB42', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb43 = models.IntegerField(db_column='AVR_NOISE_PRB43', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb44 = models.IntegerField(db_column='AVR_NOISE_PRB44', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb45 = models.IntegerField(db_column='AVR_NOISE_PRB45', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb46 = models.IntegerField(db_column='AVR_NOISE_PRB46', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb47 = models.IntegerField(db_column='AVR_NOISE_PRB47', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb48 = models.IntegerField(db_column='AVR_NOISE_PRB48', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb49 = models.IntegerField(db_column='AVR_NOISE_PRB49', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb50 = models.IntegerField(db_column='AVR_NOISE_PRB50', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb51 = models.IntegerField(db_column='AVR_NOISE_PRB51', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb52 = models.IntegerField(db_column='AVR_NOISE_PRB52', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb53 = models.IntegerField(db_column='AVR_NOISE_PRB53', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb54 = models.IntegerField(db_column='AVR_NOISE_PRB54', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb55 = models.IntegerField(db_column='AVR_NOISE_PRB55', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb56 = models.IntegerField(db_column='AVR_NOISE_PRB56', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb57 = models.IntegerField(db_column='AVR_NOISE_PRB57', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb58 = models.IntegerField(db_column='AVR_NOISE_PRB58', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb59 = models.IntegerField(db_column='AVR_NOISE_PRB59', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb60 = models.IntegerField(db_column='AVR_NOISE_PRB60', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb61 = models.IntegerField(db_column='AVR_NOISE_PRB61', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb62 = models.IntegerField(db_column='AVR_NOISE_PRB62', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb63 = models.IntegerField(db_column='AVR_NOISE_PRB63', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb64 = models.IntegerField(db_column='AVR_NOISE_PRB64', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb65 = models.IntegerField(db_column='AVR_NOISE_PRB65', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb66 = models.IntegerField(db_column='AVR_NOISE_PRB66', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb67 = models.IntegerField(db_column='AVR_NOISE_PRB67', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb68 = models.IntegerField(db_column='AVR_NOISE_PRB68', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb69 = models.IntegerField(db_column='AVR_NOISE_PRB69', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb70 = models.IntegerField(db_column='AVR_NOISE_PRB70', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb71 = models.IntegerField(db_column='AVR_NOISE_PRB71', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb72 = models.IntegerField(db_column='AVR_NOISE_PRB72', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb73 = models.IntegerField(db_column='AVR_NOISE_PRB73', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb74 = models.IntegerField(db_column='AVR_NOISE_PRB74', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb75 = models.IntegerField(db_column='AVR_NOISE_PRB75', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb76 = models.IntegerField(db_column='AVR_NOISE_PRB76', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb77 = models.IntegerField(db_column='AVR_NOISE_PRB77', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb78 = models.IntegerField(db_column='AVR_NOISE_PRB78', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb79 = models.IntegerField(db_column='AVR_NOISE_PRB79', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb80 = models.IntegerField(db_column='AVR_NOISE_PRB80', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb81 = models.IntegerField(db_column='AVR_NOISE_PRB81', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb82 = models.IntegerField(db_column='AVR_NOISE_PRB82', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb83 = models.IntegerField(db_column='AVR_NOISE_PRB83', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb84 = models.IntegerField(db_column='AVR_NOISE_PRB84', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb85 = models.IntegerField(db_column='AVR_NOISE_PRB85', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb86 = models.IntegerField(db_column='AVR_NOISE_PRB86', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb87 = models.IntegerField(db_column='AVR_NOISE_PRB87', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb88 = models.IntegerField(db_column='AVR_NOISE_PRB88', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb89 = models.IntegerField(db_column='AVR_NOISE_PRB89', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb90 = models.IntegerField(db_column='AVR_NOISE_PRB90', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb91 = models.IntegerField(db_column='AVR_NOISE_PRB91', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb92 = models.IntegerField(db_column='AVR_NOISE_PRB92', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb93 = models.IntegerField(db_column='AVR_NOISE_PRB93', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb94 = models.IntegerField(db_column='AVR_NOISE_PRB94', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb95 = models.IntegerField(db_column='AVR_NOISE_PRB95', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb96 = models.IntegerField(db_column='AVR_NOISE_PRB96', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb97 = models.IntegerField(db_column='AVR_NOISE_PRB97', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb98 = models.IntegerField(db_column='AVR_NOISE_PRB98', blank=True, null=True)  # Field name made lowercase.
+    avr_noise_prb99 = models.IntegerField(db_column='AVR_NOISE_PRB99', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'tbprb'
+        unique_together = (('sector_name', 'date'),)
 
 
 class Tbsecadjcell(models.Model):

@@ -8,7 +8,9 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db import models as md
 from django.views.decorators.clickjacking import xframe_options_exempt
+from django.db.models import Count
 from . import models, forms
+from scipy import stats
 import hashlib
 import xlrd
 import xlwt
@@ -625,3 +627,34 @@ def prb_info(request):
     if request.method == "POST":
         pass
     return render(request, 'login/query/prb_info.html', locals())
+
+
+'''三元组分析'''
+
+
+def analyze(request):
+    try:
+        Scell_Name = models.Tbmrodata.objects.values_list('servingsector').annotate(Count('servingsector'))
+        Ncell_Name = models.Tbmrodata.objects.values_list('interferingsector').annotate(Count('interferingsector'))
+    except:
+        print("error")
+    num = 50
+    cursor = connection.cursor()
+    for i in range(0, len(Scell_Name)):
+        for j in range(0, len(Ncell_Name)):
+            if (models.Tbmrodata.objects.filter(servingsector=Scell_Name[i][0],
+                                                interferingsector=Ncell_Name[j][0]).count() > num):
+                sql = "SELECT AVG( LteScRSRP - LteNcRSRP ) AS mean, STDDEV( LteScRSRP - LteNcRSRP ) AS std FROM tbmrodata WHERE	ServingSector = '" + \
+                      Scell_Name[i][0] + "' AND InterferingSector = '" + Ncell_Name[j][0] + "';"
+                cursor.execute(sql)
+                row = cursor.fetchone()
+                print(stats.norm.cdf((9 - row[0]) / row[1]))
+                '''line = models.tbC2Inew(
+                    nc_sector_id=Ncell_Name[j][0],
+                    sc_sector_id=Scell_Name[i][0],
+                    rsrp_avg=row[0],
+                    rsrp_std=row[1],
+                    probility_9=stats.norm.cdf((9 - row[0]) / row[1]),
+                    probility_6=stats.norm.cdf((6 - row[0]) / row[1]) - stats.norm.cdf((-6 - row[0]) / row[1]),
+                )
+                models.Tbprb.objects.bulk_create(list)'''
