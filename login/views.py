@@ -455,7 +455,6 @@ def importdata(request):
                     message = '导入有误！请检查源表格式是否正确'
             else:
                 message = '请检查导入目的表是否相符'
-        # TODO 导入中，增加进度条，跳转地址需要回到父目录
         return render(request, 'login/datamanage.html', {'message': message})
     return render(request, 'login/datamanage.html')
 
@@ -564,7 +563,7 @@ def infocate2(request):
     var_map = {}
     for var in Variable.objects.raw('show global variables;'):
         var_map[var.Variable_name] = var.Value
-    print(var_map)
+    # print(var_map)
     return render(request, 'login/info/cate2.html', locals())
 
 
@@ -584,9 +583,29 @@ def info_query(request):
 
 # show information of cell settings
 def cell_info(request):
+    cell_dict = []
+    message = ''
+    # 过滤出所有小区名，并通过模板传递
+    name_list = models.Tbcell.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
-        pass
-    # TODO 过滤出所有小区名，并传递给前端
+        # 字典初始为空，查过之后就可以赋值， 重新render即可
+        # 判断是通过 name还是id 还是同时有，对enodbid要进行检查
+        if request.POST.get('submit') == 'text':
+            cellname = request.POST.get('cellname')
+            cellid = request.POST.get('cellid')
+            if cellid and not cellname:
+                cell_dict = models.Tbcell.objects.filter(sector_id=cellid).values()       # 使用.values把对象转为字典
+            elif cellname and not cellid:
+                cell_dict = models.Tbcell.objects.filter(sector_name=cellname).values()
+            elif cellid and cellname:
+                cell_dict = models.Tbcell.objects.filter(sector_id=cellid, cellname=cellname).values()
+            if not cell_dict:
+                message = "请检查输入是否正确"
+            return render(request, 'login/query/cell_info.html', locals())
+        elif request.POST.get('submit') == 'select':
+            cellname = request.POST.get('selected')
+            cell_dict = models.Tbcell.objects.filter(sector_name=cellname).values()
+            return render(request, 'login/query/cell_info.html', locals())
     return render(request, 'login/query/cell_info.html', locals())
 
 

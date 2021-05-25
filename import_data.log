@@ -1,11 +1,57 @@
-2021-05-23 12:26:09,980 - INFO - File( 9. tbMROData.csv ) [line 875606] is not qualified.
-2021-05-23 12:26:14,605 - ERROR - Internal Server Error: /datamanage/import
-Traceback (most recent call last):
-  File "C:\Users\¿ÂÎ÷\AppData\Local\Programs\Python\Python38-32\lib\site-packages\django\core\handlers\exception.py", line 47, in inner
-    response = get_response(request)
-  File "C:\Users\¿ÂÎ÷\AppData\Local\Programs\Python\Python38-32\lib\site-packages\django\core\handlers\base.py", line 181, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "E:\Pycharm_projects\djangoProject\LTEsystem\login\views.py", line 458, in importdata
-    return render(request, 'login/datamanage.html', {'message': message})
-UnboundLocalError: local variable 'message' referenced before assignment
-2021-05-23 12:30:58,856 - INFO - E:\Pycharm_projects\djangoProject\LTEsystem\login\views.py changed, reloading.
+2021-05-25 10:50:57,272 - INFO - File( 1.tbCell.xlsx ) [line 2002] is not qualified.
+2021-05-25 10:50:57,273 - INFO - File( 1.tbCell.xlsx ) [line 2003] is not qualified.
+2021-05-25 10:50:57,273 - INFO - File( 1.tbCell.xlsx ) [line 2004] is not qualified.
+2021-05-25 10:51:37,413 - INFO - File( 1.tbCell.xlsx ) [line 4584] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5453] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5454] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5455] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5456] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5457] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5458] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5459] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5460] is not qualified.
+2021-05-25 10:51:50,562 - INFO - File( 1.tbCell.xlsx ) [line 5461] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5462] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5463] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5464] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5465] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5466] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5467] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5468] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5469] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5470] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5471] is not qualified.
+2021-05-25 10:51:50,563 - INFO - File( 1.tbCell.xlsx ) [line 5472] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5473] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5474] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5475] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5476] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5477] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5478] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5479] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5480] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5481] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5482] is not qualified.
+2021-05-25 10:51:50,564 - INFO - File( 1.tbCell.xlsx ) [line 5483] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5484] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5485] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5486] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5487] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5488] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5489] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5490] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5491] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5492] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5493] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5494] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5495] is not qualified.
+2021-05-25 10:51:50,565 - INFO - File( 1.tbCell.xlsx ) [line 5496] is not qualified.
+2021-05-25 10:51:50,566 - INFO - File( 1.tbCell.xlsx ) [line 5497] is not qualified.
+2021-05-25 10:51:50,566 - INFO - File( 1.tbCell.xlsx ) [line 5498] is not qualified.
+2021-05-25 10:51:50,566 - INFO - File( 1.tbCell.xlsx ) [line 5499] is not qualified.
+2021-05-25 10:51:50,566 - INFO - File( 1.tbCell.xlsx ) [line 5500] is not qualified.
+2021-05-25 10:51:50,566 - INFO - File( 1.tbCell.xlsx ) [line 5501] is not qualified.
+2021-05-25 10:51:50,566 - INFO - File( 1.tbCell.xlsx ) [line 5502] is not qualified.
+2021-05-25 10:51:50,566 - INFO - File( 1.tbCell.xlsx ) [line 5503] is not qualified.
+2021-05-25 10:51:50,566 - INFO - File( 1.tbCell.xlsx ) [line 5504] is not qualified.
+2021-05-25 11:16:59,911 - INFO - E:\Pycharm_projects\djangoProject\LTEsystem\login\views.py changed, reloading.
