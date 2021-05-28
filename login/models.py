@@ -266,3 +266,11 @@ class TbC2Inew(models.Model):
         managed = True
         db_table = 'tbC2Inew'
 
+class tbC2I3(models.Model):
+    a_sector = models.CharField(db_column='A_SECTOR', max_length=50)  # Field name made lowercase.
+    b_sector = models.CharField(db_column='B_SECTOR', max_length=50)  # Field name made lowercase.
+    c_sector = models.CharField(db_column='C_SECTOR', max_length=50)  # Field name made lowercase.
+
+    class Meta:
+        managed = True
+        db_table = 'tbC2I3'
