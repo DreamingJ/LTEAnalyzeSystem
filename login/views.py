@@ -620,8 +620,24 @@ def enodeb_info(request):
 
 
 def kpi_info(request):
+    name_list = models.Tbkpi.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
-        pass
+        textname = request.POST.get('cellname')
+        selected = request.POST.get('selected')
+        if textname != '':
+            cellname = textname
+        else:
+            cellname = selected
+
+        date_start = request.POST.get('date_start')
+        date_end = request.POST.get('date_end')
+
+        select_attr = request.POST.get('attr')  # 得到选择的属性
+        # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
+        attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values(
+            "date", select_attr)
+        print(attr_list)
+        # TODO 画图
     return render(request, 'login/query/kpi_info.html', locals())
 
 
@@ -635,49 +651,57 @@ def prb_info(request):
 
 
 def analyze1(request):
-    num = 50
-    models.TbC2Inew.objects.all().delete()
-    cursor = connection.cursor()
-    sql = "SELECT ServingSector, InterferingSector, COUNT(*), AVG( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS mean, " \
-          "STDDEV( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS std FROM tbmrodata GROUP BY ServingSector,InterferingSector"
-    cursor.execute(sql)
-    rows = cursor.fetchall()
-    for i in range(0, len(rows)):
-        if (rows[i][2] > num):
-            line = models.TbC2Inew(
-                nc_sector_id=rows[i][1],
-                sc_sector_id=rows[i][0],
-                rsrp_avg=rows[i][3],
-                rsrp_std=rows[i][4],
-                probility_9=stats.norm.cdf((9 - rows[i][3]) / rows[i][4]),
-                probility_6=stats.norm.cdf((6 - rows[i][3]) / rows[i][4]) - stats.norm.cdf(
-                    (-6 - rows[i][3]) / rows[i][4]),
-            )
-            line.save()
+    if request.method == "POST":
+        num = request.POST.get()
+        models.TbC2Inew.objects.all().delete()
+        cursor = connection.cursor()
+        sql = "SELECT ServingSector, InterferingSector, COUNT(*), AVG( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS mean, " \
+              "STDDEV( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS std FROM tbmrodata GROUP BY ServingSector,InterferingSector"
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        for row in rows:
+            if (row[2] > num):
+                line = models.TbC2Inew(
+                    nc_sector_id=row[1],
+                    sc_sector_id=row[0],
+                    rsrp_avg=row[3],
+                    rsrp_std=row[4],
+                    probility_9=stats.norm.cdf((9 - row[3]) / row[4]),
+                    probility_6=stats.norm.cdf((6 - row[3]) / row[4]) - stats.norm.cdf(
+                        (-6 - row[3]) / row[4]),
+                )
+                line.save()
+    return render(request, 'login/analyze.html', locals())
 
 
 def analyze2(request):
-    flag = 0.5
-    try:
-        A_list = models.TbC2Inew.objects.values_list('sc_sector_id').annotate(Count('sc_sector_id'))  # ('5641-129', 29)
-    except:
-        print("error")
-    models.tbC2I3.objects.all().delete();
-    for A in A_list:
-        B_list = models.TbC2Inew.objects.values_list('nc_sector_id', 'probility_6').filter(
-            sc_sector_id=A[0])  # ('253917-2', 0.459995836019516)
-        for B in B_list:
-            if (B[1] >= flag):
-                C_list = models.TbC2Inew.objects.values_list('sc_sector_id', 'probility_6').filter(
-                    nc_sector_id=B[0])  # ('253917-2', 0.459995836019516)
-                for C in C_list:
-                    if (C[0] != A[0] and C[1] >= flag):
-                        Prb_6 = models.TbC2Inew.objects.values_list('probility_6').filter(nc_sector_id=C[0],
-                                                                                          sc_sector_id=A[0])
-                        if (Prb_6.exists() and Prb_6[0][0] > flag):
-                            line = models.tbC2I3(
-                                a_sector=A[0],
-                                b_sector=B[0],
-                                c_sector=C[0],
-                            )
-                            line.save()
+    if request.method == "POST":
+        flag = request.POST.get("control_arg")
+
+        try:
+            A_list = models.TbC2Inew.objects.values_list('sc_sector_id').annotate(
+                Count('sc_sector_id'))  # ('5641-129', 29)
+        except:
+            print("error")
+        row_list = []
+        for A in A_list:
+            B_list = models.TbC2Inew.objects.values_list('nc_sector_id', 'probility_6').filter(
+                sc_sector_id=A[0])  # ('253917-2', 0.459995836019516)
+            for B in B_list:
+                if (B[1] >= flag):
+                    C_list = models.TbC2Inew.objects.values_list('sc_sector_id', 'probility_6').filter(
+                        nc_sector_id=B[0])  # ('253917-2', 0.459995836019516)
+                    for C in C_list:
+                        if (C[0] != A[0] and C[1] >= flag):
+                            Prb_6 = models.TbC2Inew.objects.values_list('probility_6').filter(nc_sector_id=C[0],
+                                                                                              sc_sector_id=A[0])
+                            if (Prb_6.exists() and Prb_6[0][0] > flag):
+                                line = models.tbC2I3(
+                                    a_sector=A[0],
+                                    b_sector=B[0],
+                                    c_sector=C[0],
+                                )
+                                row_list.append(line)
+        models.tbC2I3.objects.all().delete()
+        models.tbC2I3.objects.bulk_create(row_list)
+    return render(request, 'login/analyze.html', locals())

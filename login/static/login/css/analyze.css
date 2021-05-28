@@ -13,8 +13,9 @@ body {
 
 .sub-header {
     font-size: 30px;
-    color: #0c1a27ed;
-    margin: 20px 0 0px 0px;
+    /*color: #0c1a27ed;*/
+    color: #123844bf;
+    margin: 10px 0 0px 0px;
     font-weight: bold;
     align-self: center;
 }
@@ -28,7 +29,6 @@ body {
 .wrapper {
     display: flex;
     flex-direction: row;
-    width: 900px;
     justify-content: space-between;
     margin-top: 20px;
 }
@@ -42,10 +42,11 @@ body {
 /*}*/
 
 .textbox {
-    width: 400px;
+    width: 1000px;
+    height: 50px;
     margin-bottom: 0px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     background-color: #88c7dd85;
     border-radius: 10px;
@@ -53,21 +54,11 @@ body {
 }
 
 .param {
+    width: 1000px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.selectbox {
-    width: 400px;
-    /*margin-top: 50px;*/
-    /*margin-left: 100px;*/
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #88c7dd85;
-    border-radius: 10px;
-    opacity: 0.8;
+    flex-direction: row;
+    justify-content: space-around;
+    /*align-items: center;*/
 }
 
 .title {
@@ -78,21 +69,21 @@ body {
 }
 
 .button {
-    margin: 0 20px 20px;
+    margin-left: -250px;
 }
 
 .table-container {
-    max-width: 90vw;
+    width: 1000px;
     overflow-x: auto;
     border: 2px solid #888;
     border-radius: 4px;
     background-color: #b3d7ff;
-        margin-top: 40px;
+        margin-top:20px;
 }
 
-/*.table-container::-webkit-scrollbar {*/
-/*    display: none;*/
-/*}*/
+.table-container::-webkit-scrollbar {
+    display: none;
+}
 
 .table {
     font-size: 13px;
