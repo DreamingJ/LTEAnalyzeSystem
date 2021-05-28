@@ -1,0 +1,68 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- 上述meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'login/css/analyze.css' %}" rel="stylesheet"/>
+    <title>LTE网络干扰分析系统-三元组分析</title>
+
+</head>
+<body>
+
+<div class="container">
+    <div id="header">LTE网络干扰分析系统
+    </div>
+    <div class="sub-header">重叠覆盖干扰小区三元组分析</div>
+    <div class="wrapper">
+        <div class="textbox">
+            <form class="param" action="/analyze/" method="post">
+                {% csrf_token %}
+                <div>
+                <label>请输入控制参数：</label>
+                <input type="text" name="control_arg" id="cellname">
+                    </div>
+                <div class="button">
+                    <button type="submit" class="btn btn-primary float-right">确定查询</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="table-container">
+        <table cellspacing="2" cellpadding="2" bgcolor="#ffffff" class="table">
+            <thead>
+            <tr>
+                <th>小区1</th>
+                <th>小区2</th>
+                <th>小区3</th>
+            </tr>
+            </thead>
+            <tbody>
+{#            {% for dict in cell_dict %}#}
+{#                <tr>#}
+{#                    {% for key,val in dict.items %}#}
+{#                        <td>{{ val }}</td>#}
+{#                    {% endfor %}#}
+{#                </tr>#}
+{#            {% endfor %}#}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+{#    以下三者的引用顺序是固定的#}
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.15.0/umd/popper.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

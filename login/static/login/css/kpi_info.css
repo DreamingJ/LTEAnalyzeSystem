@@ -1,0 +1,60 @@
+body {
+    height: 100%;
+    background-image: url('../images/bg2.jpg');
+}
+
+#header {
+    font-size: 35px;
+    color: #123844bf;
+    margin: 10px 0 10px 0px;
+    font-weight: bold;
+    align-self: center;
+}
+
+.sub-header {
+    font-size: 30px;
+    color: #0c1a27ed;
+    margin: 10px 0 0px 0px;
+    font-weight: bold;
+    align-self: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.left-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-top: 0;
+}
+
+.attr-container{
+    overflow: auto;
+    height: 400px;
+    border: 2px solid #888;
+    border-radius: 4px;
+}
+
+.title {
+    margin: 10px 10px 10px 0;
+    font-size: 28px;
+    font-weight: 550;
+    color: #212529;
+}
+
+.button {
+    margin: 0 20px 20px;
+}
+
+

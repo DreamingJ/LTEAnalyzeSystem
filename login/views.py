@@ -618,8 +618,23 @@ def enodeb_info(request):
 
 
 def kpi_info(request):
+    name_list = models.Tbkpi.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
-        pass
+        textname = request.POST.get('cellname')
+        selected = request.POST.get('selected')
+        if textname != '':
+            cellname = textname
+        else:
+            cellname = selected
+
+        date_start = request.POST.get('date_start')
+        date_end = request.POST.get('date_end')
+
+        select_attr = request.POST.get('attr')  # 得到选择的属性
+        # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
+        attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values("date", select_attr)
+        print(attr_list)
+        # TODO 画图
     return render(request, 'login/query/kpi_info.html', locals())
 
 
@@ -633,28 +648,31 @@ def prb_info(request):
 
 
 def analyze(request):
-    try:
-        Scell_Name = models.Tbmrodata.objects.values_list('servingsector').annotate(Count('servingsector'))
-        Ncell_Name = models.Tbmrodata.objects.values_list('interferingsector').annotate(Count('interferingsector'))
-    except:
-        print("error")
-    num = 50
-    cursor = connection.cursor()
-    for i in range(0, len(Scell_Name)):
-        for j in range(0, len(Ncell_Name)):
-            if (models.Tbmrodata.objects.filter(servingsector=Scell_Name[i][0],
-                                                interferingsector=Ncell_Name[j][0]).count() > num):
-                sql = "SELECT AVG( LteScRSRP - LteNcRSRP ) AS mean, STDDEV( LteScRSRP - LteNcRSRP ) AS std FROM tbmrodata WHERE	ServingSector = '" + \
-                      Scell_Name[i][0] + "' AND InterferingSector = '" + Ncell_Name[j][0] + "';"
-                cursor.execute(sql)
-                row = cursor.fetchone()
-                print(stats.norm.cdf((9 - row[0]) / row[1]))
-                '''line = models.tbC2Inew(
-                    nc_sector_id=Ncell_Name[j][0],
-                    sc_sector_id=Scell_Name[i][0],
-                    rsrp_avg=row[0],
-                    rsrp_std=row[1],
-                    probility_9=stats.norm.cdf((9 - row[0]) / row[1]),
-                    probility_6=stats.norm.cdf((6 - row[0]) / row[1]) - stats.norm.cdf((-6 - row[0]) / row[1]),
-                )
-                models.Tbprb.objects.bulk_create(list)'''
+    if request.method == "POST":
+        arg_x = request.POST.get('control_arg')
+        try:
+            Scell_Name = models.Tbmrodata.objects.values_list('servingsector').annotate(Count('servingsector'))
+            Ncell_Name = models.Tbmrodata.objects.values_list('interferingsector').annotate(Count('interferingsector'))
+        except:
+            print("error")
+        num = 50
+        cursor = connection.cursor()
+        for i in range(0, len(Scell_Name)):
+            for j in range(0, len(Ncell_Name)):
+                if (models.Tbmrodata.objects.filter(servingsector=Scell_Name[i][0],
+                                                    interferingsector=Ncell_Name[j][0]).count() > num):
+                    sql = "SELECT AVG( LteScRSRP - LteNcRSRP ) AS mean, STDDEV( LteScRSRP - LteNcRSRP ) AS std FROM tbmrodata WHERE	ServingSector = '" + \
+                          Scell_Name[i][0] + "' AND InterferingSector = '" + Ncell_Name[j][0] + "';"
+                    cursor.execute(sql)
+                    row = cursor.fetchone()
+                    print(stats.norm.cdf((9 - row[0]) / row[1]))
+                    '''line = models.tbC2Inew(
+                        nc_sector_id=Ncell_Name[j][0],
+                        sc_sector_id=Scell_Name[i][0],
+                        rsrp_avg=row[0],
+                        rsrp_std=row[1],
+                        probility_9=stats.norm.cdf((9 - row[0]) / row[1]),
+                        probility_6=stats.norm.cdf((6 - row[0]) / row[1]) - stats.norm.cdf((-6 - row[0]) / row[1]),
+                    )
+                    models.Tbprb.objects.bulk_create(list)'''
+    return render(request, 'login/analyze.html', locals())
