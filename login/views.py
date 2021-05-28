@@ -11,6 +11,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.db.models import Count
 from . import models, forms
 from scipy import stats
+import matplotlib.pyplot as plt
 import hashlib
 import xlrd
 import xlwt
@@ -633,8 +634,22 @@ def kpi_info(request):
         select_attr = request.POST.get('attr')  # 得到选择的属性
         # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
         attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values("date", select_attr)
-        print(attr_list)
-        # TODO 画图
+        # 绘图 开始两行代码解决 plt 中文显示的问题
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.rcParams['axes.unicode_minus'] = False
+        x_date = [str(data['date']).split()[0] for data in attr_list]
+        y_value = [data[select_attr] for data in attr_list]
+        plt.figure(figsize=(10, 4), dpi=100)
+        plt.plot(x_date, y_value, marker="*", linewidth=1.0)
+        plt.grid(color="k", linestyle=":")
+        # plt.bar(x_date, y_value, width=0.5, color="#87CEFA")
+        plt.title("小区：" + cellname + "    属性：" + select_attr)
+        plt.xlabel('日期')
+        plt.ylabel('属性值')
+        for a, b in zip(x_date, y_value):
+            plt.text(a, b, b, ha='center', va='bottom', fontsize=12)
+        plt.savefig("login/static/login/images/kpi_info.png")
+        return render(request, 'login/query/image_kpi.html', locals())
     return render(request, 'login/query/kpi_info.html', locals())
 
 
