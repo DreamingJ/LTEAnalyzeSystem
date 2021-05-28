@@ -69,7 +69,11 @@ body {
 }
 
 .button {
-    margin-left: -250px;
+    margin-left: -150px;
+}
+
+.input-container {
+    margin-left: -20px;
 }
 
 .table-container {
