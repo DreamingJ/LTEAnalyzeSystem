@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db import models as md
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.db.models import Count
+from django.db.models import Count, F
 from . import models, forms
 from scipy import stats
 import matplotlib.pyplot as plt
@@ -169,7 +169,8 @@ def datamanage(request):
 def importdata(request):
     # TODO 导入进度条
     # TODO filter很慢，加入判断是否已存在然后覆盖的逻辑后，插入时间大大增加，1s变为45s
-    logging.basicConfig(filename='import_data.log', filemode='w', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+    logging.basicConfig(filename='import_data.log', filemode='w', level=logging.INFO,
+                        format="%(asctime)s - %(levelname)s - %(message)s")
     once_row = 300  # 每次读取行数，可修改
     if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
         return redirect('/login/')
@@ -197,8 +198,8 @@ def importdata(request):
                                 if row[5] in earfcn_list and row[6] in pci_list and row[10] in vendor_list \
                                         and -180.00000 <= float(row[11]) <= 180.00000 and -90.00000 <= float(
                                     row[12]) <= 90.00000 and row[13] in style_list and not isinstance(row[18], str) \
-                                        and row[18] == row[16] + row[17]:   # 数据清洗
-                                    if models.Tbcell.objects.filter(sector_id=row[1]).count() != 0:   # 数据已存在，用新数据覆盖原数据
+                                        and row[18] == row[16] + row[17]:  # 数据清洗
+                                    if models.Tbcell.objects.filter(sector_id=row[1]).count() != 0:  # 数据已存在，用新数据覆盖原数据
                                         models.Tbcell.objects.filter(sector_id=row[1]).delete()
                                     line = models.Tbcell(city=row[0],
                                                          sector_id=row[1],
@@ -239,9 +240,10 @@ def importdata(request):
                                 if row[0] != '' and row[2] != '' and row[3] != '':
                                     date_pre = time.strptime(row[0], "%m/%d/%Y %H:%M:%S")
                                     date_insert = time.strftime("%Y-%m-%d %H:%M:%S", date_pre)
-                                    if models.Tbkpi.objects.filter(date=date_insert, sector_name=row[3]).count() != 0:   # 数据已存在，用新数据覆盖原数据
+                                    if models.Tbkpi.objects.filter(date=date_insert,
+                                                                   sector_name=row[3]).count() != 0:  # 数据已存在，用新数据覆盖原数据
                                         models.Tbkpi.objects.filter(date=date_insert, sector_name=row[3]).delete()
-                                    line = models.Tbkpi(date=date_insert,   # 读入是str，日期格式转换
+                                    line = models.Tbkpi(date=date_insert,  # 读入是str，日期格式转换
                                                         enodeb_name=row[1],
                                                         sector=row[2],
                                                         sector_name=row[3],
@@ -437,20 +439,20 @@ def importdata(request):
                             row = line.split(",")
                             if index == 0:
                                 continue
-                            if index % once_row == 0:    # 批量插入
+                            if index % once_row == 0:  # 批量插入
                                 models.Tbmrodata.objects.bulk_create(row_list)
                                 row_list = []
                             if row[0] != '' and row[1] != '' and row[2] != '':
                                 line_in = models.Tbmrodata(timestamp=row[0],
-                                                        servingsector=row[1],
-                                                        interferingsector=row[2],
-                                                        ltescrsrp=float(row[3]),
-                                                        ltencrsrp=float(row[4]),
-                                                        ltencearfcn=int(row[5]),
-                                                        ltencpci=int(row[6]))
+                                                           servingsector=row[1],
+                                                           interferingsector=row[2],
+                                                           ltescrsrp=float(row[3]),
+                                                           ltencrsrp=float(row[4]),
+                                                           ltencearfcn=int(row[5]),
+                                                           ltencpci=int(row[6]))
                                 row_list.append(line_in)
                             else:
-                                logging.info("File( %s ) [line %d] is not qualified.", f.name, index+1)
+                                logging.info("File( %s ) [line %d] is not qualified.", f.name, index + 1)
                         models.Tbmrodata.objects.bulk_create(row_list)  # 最后剩余数据
                         message = '导入成功！'
                 except Exception as e:
@@ -597,7 +599,7 @@ def cell_info(request):
             cellname = request.POST.get('cellname')
             cellid = request.POST.get('cellid')
             if cellid and not cellname:
-                cell_dict = models.Tbcell.objects.filter(sector_id=cellid).values()       # 使用.values把对象转为字典
+                cell_dict = models.Tbcell.objects.filter(sector_id=cellid).values()  # 使用.values把对象转为字典
             elif cellname and not cellid:
                 cell_dict = models.Tbcell.objects.filter(sector_name=cellname).values()
             elif cellid and cellname:
@@ -662,32 +664,61 @@ def prb_info(request):
 '''三元组分析'''
 
 
-def analyze(request):
+def analyze1(num):
+    models.TbC2Inew.objects.all().delete()
+    cursor = connection.cursor()
+    sql = "SELECT ServingSector, InterferingSector, COUNT(*), AVG( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS mean, " \
+          "STDDEV( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS std FROM tbmrodata GROUP BY ServingSector,InterferingSector"
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    for row in rows:
+        if (row[2] > num):
+            line = models.TbC2Inew(
+                nc_sector_id=row[1],
+                sc_sector_id=row[0],
+                rsrp_avg=row[3],
+                rsrp_std=row[4],
+                probility_9=stats.norm.cdf((9 - row[3]) / row[4]),
+                probility_6=stats.norm.cdf((6 - row[3]) / row[4]) - stats.norm.cdf(
+                    (-6 - row[3]) / row[4]),
+            )
+            line.save()
+    return "success"
+
+
+def analyze2(request):
     if request.method == "POST":
-        arg_x = request.POST.get('control_arg')
+        flag = float(request.POST.get("bound_arg"))/100.0
+        num = request.POST.get("control_arg")
+        if(num!=""):
+            analyze1(int(num))
         try:
-            Scell_Name = models.Tbmrodata.objects.values_list('servingsector').annotate(Count('servingsector'))
-            Ncell_Name = models.Tbmrodata.objects.values_list('interferingsector').annotate(Count('interferingsector'))
+            A_list = models.TbC2Inew.objects.values_list('sc_sector_id').annotate(Count('sc_sector_id')) # ('5641-129', 29)
         except:
             print("error")
-        num = 50
-        cursor = connection.cursor()
-        for i in range(0, len(Scell_Name)):
-            for j in range(0, len(Ncell_Name)):
-                if (models.Tbmrodata.objects.filter(servingsector=Scell_Name[i][0],
-                                                    interferingsector=Ncell_Name[j][0]).count() > num):
-                    sql = "SELECT AVG( LteScRSRP - LteNcRSRP ) AS mean, STDDEV( LteScRSRP - LteNcRSRP ) AS std FROM tbmrodata WHERE	ServingSector = '" + \
-                          Scell_Name[i][0] + "' AND InterferingSector = '" + Ncell_Name[j][0] + "';"
-                    cursor.execute(sql)
-                    row = cursor.fetchone()
-                    print(stats.norm.cdf((9 - row[0]) / row[1]))
-                    '''line = models.tbC2Inew(
-                        nc_sector_id=Ncell_Name[j][0],
-                        sc_sector_id=Scell_Name[i][0],
-                        rsrp_avg=row[0],
-                        rsrp_std=row[1],
-                        probility_9=stats.norm.cdf((9 - row[0]) / row[1]),
-                        probility_6=stats.norm.cdf((6 - row[0]) / row[1]) - stats.norm.cdf((-6 - row[0]) / row[1]),
-                    )
-                    models.Tbprb.objects.bulk_create(list)'''
+        row_list = []
+        dict=[]
+        for A in A_list:
+            B_list = models.TbC2Inew.objects.values_list('nc_sector_id', 'probility_6').filter(
+                sc_sector_id=A[0])  # ('253917-2', 0.459995836019516)
+            for B in B_list:
+                if (B[1] >= flag):
+                    C_list = models.TbC2Inew.objects.values_list('sc_sector_id', 'probility_6').filter(
+                        nc_sector_id=B[0])  # ('253917-2', 0.459995836019516)
+                    for C in C_list:
+                        if (C[0]!=A[0]):
+                            Prb_6 = models.TbC2Inew.objects.values_list('probility_6').filter(nc_sector_id=C[0],
+                                                                                              sc_sector_id=A[0])
+                            temp=[A[0],B[0],C[0]]
+                            temp.sort();
+                            if (temp not in dict and Prb_6.exists() and Prb_6[0][0] >= flag):
+                                line = models.tbC2I3(
+                                    a_sector=A[0],
+                                    b_sector=B[0],
+                                    c_sector=C[0],
+                                )
+                                dict.append(temp)
+                                row_list.append(line)
+        models.tbC2I3.objects.all().delete()
+        models.tbC2I3.objects.bulk_create(row_list)
     return render(request, 'login/analyze.html', locals())

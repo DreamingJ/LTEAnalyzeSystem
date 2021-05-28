@@ -24,9 +24,10 @@
                 {% csrf_token %}
                 <div class="input-container">
                     <label>请输入控制参数:</label>
-                    <input name="control_arg" id="cellname" type="number" placeholder="50" step="1" min="0" required>&nbsp;&nbsp;
+                    <input name="control_arg" id="cellname" type="number" placeholder="50" step="1" min="0">&nbsp;&nbsp;
                     <label>阈值参数(%):</label>
-                    <input name="bound_arg" id="cellname" type="number" placeholder="50.00" step="0.01" min="0" max="100" required>
+                    <input name="bound_arg" id="cellname" type="number" placeholder="50.00" step="0.01" min="0"
+                           max="100" required>
                 </div>
                 <div class="button">
                     <button type="submit" class="btn btn-primary float-right">分析</button>
@@ -44,13 +45,13 @@
             </tr>
             </thead>
             <tbody>
-            {#            {% for dict in cell_dict %}#}
-            {#                <tr>#}
-            {#                    {% for key,val in dict.items %}#}
-            {#                        <td>{{ val }}</td>#}
-            {#                    {% endfor %}#}
-            {#                </tr>#}
-            {#            {% endfor %}#}
+            {% for dict_line in dict %}
+                <tr>
+                    {% for num in dict_line %}
+                        <td>{{ num }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>
