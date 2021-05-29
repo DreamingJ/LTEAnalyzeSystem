@@ -522,8 +522,9 @@ def exportdata(request):
     return response
 
 
-# TODO 之后增加下拉框，用户能自由选择修改哪个缓冲区
 def connectmanage(request):
+    if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
+        return redirect('/login/')
     if request.method == "POST":
         time = request.POST.get('time')
         cachesize = request.POST.get('cachesize')
@@ -583,6 +584,8 @@ def infocate3(request):
 
 
 def info_query(request):
+    if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
+        return redirect('/login/')
     return render(request, 'login/query/info_query.html', locals())
 
 
@@ -606,6 +609,7 @@ def cell_info(request):
                 cell_dict = models.Tbcell.objects.filter(sector_id=cellid, cellname=cellname).values()
             if not cell_dict:
                 message = "请检查输入是否正确"
+
             return render(request, 'login/query/cell_info.html', locals())
         elif request.POST.get('submit') == 'select':
             cellname = request.POST.get('selected')
@@ -654,6 +658,21 @@ def kpi_info(request):
         return render(request, 'login/query/image_kpi.html', locals())
     return render(request, 'login/query/kpi_info.html', locals())
 
+
+def load_image(request):
+    img_file = open("login/static/login/images/kpi_info.png", 'rb')
+    response = HttpResponse(img_file)
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="kpi_info.png"'
+    return response
+
+
+def load_csv(request):
+    csv_file = open("login/static/login/images/tecell_info.csv", 'rb')
+    response = HttpResponse(csv_file)
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="tecell_info.csv"'
+    return response
 
 def prb_info(request):
     if request.method == "POST":

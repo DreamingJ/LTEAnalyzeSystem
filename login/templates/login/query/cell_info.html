@@ -24,71 +24,78 @@
         </script>
     {% endif %}
     <div class="wrapper">
-        <div class="textbox">
-            <form class="param" action="/infoquery/cell/" method="post">
-                {% csrf_token %}
-                <label>小区ID</label>
-                <input type="text" name="cellid" id="cellid">
-                <label>小区名称</label>
-                <input type="text" name="cellname" id="cellname"><br>
-                <div class="button">
-                    <button type="submit" class="btn btn-primary float-right" name="submit" value="text">查询</button>
-                </div>
-            </form>
+        <div class="box-wrapper">
+            <div class="textbox">
+                <form class="param" action="/infoquery/cell/" method="post">
+                    {% csrf_token %}
+                    <label>小区ID</label>
+                    <input type="text" name="cellid" id="cellid">
+                    <label>小区名称</label>
+                    <input type="text" name="cellname" id="cellname"><br>
+                    <div class="button">
+                        <button type="submit" class="btn btn-primary float-right" name="submit" value="text">查询</button>
+                    </div>
+                </form>
+            </div>
+            <div class="selectbox">
+                <form class="param" action="/infoquery/cell/" method="post">
+                    {% csrf_token %}
+                    <p>选择小区名称</p>
+                    <select name="selected">
+                        {% for name in name_list %}
+                            <option value={{ name }}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="button-low">
+                        <button type="submit" class="btn btn-primary float-right" name="submit" value="select">查询
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="export-container">
+                <a href="/load_csv/">
+                    <button class="btn btn-primary float-right">导出查询数据</button>
+                </a>
+            </div>
         </div>
-        <div class="selectbox">
-            <form class="param" action="/infoquery/cell/" method="post">
-                {% csrf_token %}
-                <label>选择小区名称</label>
-                <select name="selected">
-                    {% for name in name_list %}
-                        <option value={{ name }}>{{ name }}</option>
-                    {% endfor %}
-                </select>
-                <div class="button">
-                    <button type="submit" class="btn btn-primary float-right" name="submit" value="select">查询</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    {#border="1" cellspacing="2" cellpadding="4" bgcolor="#ffffff" class="table" align="center"#}
-    <div class="table-container">
-        <table cellspacing="2" cellpadding="2" bgcolor="#ffffff" class="table">
-            <thead>
-            <tr>
-                <th>CITY</th>
-                <th>SECTOR_ID</th>
-                <th id="secName">SECTOR_NAME</th>
-                <th>ENODEBID</th>
-                <th>ENODEB_NAME</th>
-                <th>EARFCN</th>
-                <th>PCI</th>
-                <th>PSS</th>
-                <th>SSS</th>
-                <th>TAC</th>
-                <th>VENDOR</th>
-                <th>LONGITUDE</th>
-                <th>LATITUDE</th>
-                <th>STYLE</th>
-                <th>AZIMUTH</th>
-                <th>HEIGHT</th>
-                <th>ELECTTILT</th>
-                <th>MECHTILT</th>
-                <th>TOTLETILT</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for dict in cell_dict %}
+        {#border="1" cellspacing="2" cellpadding="4" bgcolor="#ffffff" class="table" align="center"#}
+        <div class="table-container">
+            <table cellspacing="2" cellpadding="2" bgcolor="#ffffff" class="table">
+                <thead>
                 <tr>
-                    {% for key,val in dict.items %}
-                        <td>{{ val }}</td>
-                    {% endfor %}
+                    <th>地区名称</th>
+                    <th>小区ID</th>
+                    <th id="secName">小区名称</th>
+                    <th>基站ID</th>
+                    <th>基站名称</th>
+                    <th>小区配置的频点编号</th>
+                    <th>物理小区标识</th>
+                    <th>主同步信号标识</th>
+                    <th>辅同步信号标识</th>
+                    <th>跟踪区编码</th>
+                    <th>设备厂家</th>
+                    <th>小区所属基站的经度</th>
+                    <th>小区所属基站的纬度</th>
+                    <th>基站类型</th>
+                    <th>小区天线方位角</th>
+                    <th>小区天线高度</th>
+                    <th>小区天线电下倾角</th>
+                    <th>小区天线机械下倾角</th>
+                    <th>总下倾角</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for dict in cell_dict %}
+                    <tr>
+                        {% for key,val in dict.items %}
+                            <td>{{ val }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-
 </div>
 
 

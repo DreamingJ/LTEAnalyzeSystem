@@ -78,16 +78,18 @@ body {
 
 .table-container {
     width: 1000px;
+    height: 600px;
     overflow-x: auto;
+    overflow-y: auto;
     border: 2px solid #888;
     border-radius: 4px;
     background-color: #b3d7ff;
         margin-top:20px;
 }
 
-.table-container::-webkit-scrollbar {
-    display: none;
-}
+/*.table-container::-webkit-scrollbar {*/
+/*    display: none;*/
+/*}*/
 
 .table {
     font-size: 13px;

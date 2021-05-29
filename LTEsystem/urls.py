@@ -42,4 +42,5 @@ urlpatterns = [
     path('infoquery/kpi/', views.kpi_info),
     path('infoquery/prb/', views.prb_info),
     path('analyze/', views.analyze2),
+    path('load_image/', views.load_image),
 ]
