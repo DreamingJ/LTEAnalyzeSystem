@@ -592,6 +592,8 @@ def info_query(request):
 # show information of cell settings
 def cell_info(request):
     cell_dict = []
+    cellname = ''
+    cellid = ''
     message = ''
     # 过滤出所有小区名，并通过模板传递
     name_list = models.Tbcell.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
@@ -608,13 +610,26 @@ def cell_info(request):
             elif cellid and cellname:
                 cell_dict = models.Tbcell.objects.filter(sector_id=cellid, cellname=cellname).values()
             if not cell_dict:
-                message = "请检查输入是否正确"
-
-            return render(request, 'login/query/cell_info.html', locals())
+                message = "请检查输入是否正确!"
+                return render(request, 'login/query/cell_info.html', locals())
         elif request.POST.get('submit') == 'select':
             cellname = request.POST.get('selected')
             cell_dict = models.Tbcell.objects.filter(sector_name=cellname).values()
-            return render(request, 'login/query/cell_info.html', locals())
+        # 生成csv文件保存
+        csv_file = "login/static/login/csv_files/cell_info.csv"
+        # tablehead = []
+        # rows_list = []
+        # for key, val in dict.items():
+        #     tablehead.append(key)
+        #     rows_list.append(val)
+        with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(cell_dict[0].keys())
+            for dict in cell_dict:
+                writer.writerow(dict.values())
+        return render(request, 'login/query/cell_info.html', locals())
+    elif request.method == "GET":
+        return load_csv(csv_filename="cell_info")
     return render(request, 'login/query/cell_info.html', locals())
 
 
@@ -659,6 +674,7 @@ def kpi_info(request):
     return render(request, 'login/query/kpi_info.html', locals())
 
 
+# TODO 此函数改为可复用的
 def load_image(request):
     img_file = open("login/static/login/images/kpi_info.png", 'rb')
     response = HttpResponse(img_file)
@@ -667,11 +683,11 @@ def load_image(request):
     return response
 
 
-def load_csv(request):
-    csv_file = open("login/static/login/images/tecell_info.csv", 'rb')
+def load_csv(csv_filename):
+    csv_file = open("login/static/login/csv_files/" + csv_filename + ".csv", 'rb')
     response = HttpResponse(csv_file)
-    response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = 'attachment;filename="tecell_info.csv"'
+    response['Content-Type'] = 'text/csv'
+    response['Content-Disposition'] = 'attachment;filename="cell_info.csv"'
     return response
 
 def prb_info(request):

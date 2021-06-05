@@ -29,9 +29,9 @@
                 <form class="param" action="/infoquery/cell/" method="post">
                     {% csrf_token %}
                     <label>小区ID</label>
-                    <input type="text" name="cellid" id="cellid">
+                    <input type="text" name="cellid" id="cellid" value="{{ cellid }}">
                     <label>小区名称</label>
-                    <input type="text" name="cellname" id="cellname"><br>
+                    <input type="text" name="cellname" id="cellname" value="{{ cellname }}"><br>
                     <div class="button">
                         <button type="submit" class="btn btn-primary float-right" name="submit" value="text">查询</button>
                     </div>
@@ -53,9 +53,9 @@
                 </form>
             </div>
             <div class="export-container">
-                <a href="/load_csv/">
-                    <button class="btn btn-primary float-right">导出查询数据</button>
-                </a>
+                <form class="param" action="/infoquery/cell/" method="get">
+                    <button type="submit" class="btn btn-primary float-right">导出查询数据</button>
+                </form>
             </div>
         </div>
         {#border="1" cellspacing="2" cellpadding="4" bgcolor="#ffffff" class="table" align="center"#}

@@ -43,4 +43,5 @@ urlpatterns = [
     path('infoquery/prb/', views.prb_info),
     path('analyze/', views.analyze2),
     path('load_image/', views.load_image),
+    path('load_csv/', views.load_csv),
 ]
