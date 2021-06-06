@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db import models as md
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.db.models import Count, F
+from django.db.models import Count
 from . import models, forms
 from scipy import stats
 import matplotlib.pyplot as plt
@@ -28,6 +28,19 @@ class Variable(md.Model):
 
 
 # To encode the password
+
+def get_result_fromat(data, cols):
+    tmp_str = ""
+    for col in cols:
+        tmp_str += '"%s",' % (col)
+    yield tmp_str.strip(",") + "\n"
+    for row in data:
+        tmp_str = ""
+        for col in cols:
+            tmp_str += '"%s",' % (str(row[col]))
+        yield tmp_str.strip(',') + "\n"
+
+
 def hash_code(s, salt='LTEsystem'):
     h = hashlib.sha256()
     s += salt
@@ -649,7 +662,7 @@ def enodeb_info(request):
                 cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()  # 使用.values把对象转为字典
             elif enodeb_name and not enodeb_id:
                 cell_dict = models.Tbcell.objects.filter(enodeb_name=enodeb_name).values()
-            elif enodeb_id and enodeb_name:     # 都存在，根据id
+            elif enodeb_id and enodeb_name:  # 都存在，根据id
                 cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()
             if not cell_dict:
                 message = "请检查输入是否正确!"
@@ -684,7 +697,8 @@ def kpi_info(request):
 
         select_attr = request.POST.get('attr')  # 得到选择的属性
         # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
-        attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values("date", select_attr)
+        attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values(
+            "date", select_attr)
         # 绘图 开始两行代码解决 plt 中文显示的问题
         plt.rcParams['font.sans-serif'] = ['SimHei']
         plt.rcParams['axes.unicode_minus'] = False
@@ -707,6 +721,7 @@ def kpi_info(request):
     return render(request, 'login/query/kpi_info.html', locals())
 
 
+# TODO 此函数改为可复用的
 def load_image(request):
     if request.method == "POST":
         if request.POST.get('export') == 'kpi_info':
@@ -732,6 +747,7 @@ def load_image(request):
     else:
         response = HttpResponse("请先查询再导出！")
         return response
+
 
 def load_csv(csv_filename):
     try:
@@ -791,8 +807,56 @@ def prb_info(request):
 
 def prb_stat(request):
     # TODO 使用触发器建表； 生成excel并导出
-    response = HttpResponse("demo")
+    '''models.Tbprbnew.objects.all().delete()
+    cursor = connection.cursor()
+    sql = "call kpi_info()"
+    cursor.execute(sql)'''
+    # 通过StreamingHttpResponse指定返回格式为csv
+    '''response = StreamingHttpResponse(get_result_fromat(data, cols))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(out_file_name)
+    return response'''
+    '''def downloadTest(request):
+        def file_iterator(file_name, chunk_size=512):  # 用于形成二进制数据
+            with open(file_name, 'rb') as f:
+                while True:
+                    c = f.read(chunk_size)
+                    if c:
+                        yield c
+                    else:
+                        break
+
+        the_file_name = "D:\test.xls"  # 要下载的文件路径
+        response = StreamingHttpResponse(file_iterator(the_file_name))  # 这里创建返回
+        response['Content-Type'] = 'application/vnd.ms-excel'  # 注意格式 
+        response['Content-Disposition'] = 'attachment;filename="模板.xls"'''
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename= Tbprbnew.xls'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Tbprbnew')
+    rows = models.Tbprbnew.objects.all()
+    rows_list = list(rows.values())
+    columns = []
+    if not rows:
+        return render(request, "login/datamanage.html", {'message': '此数据表为空！'})
+    for key in rows_list[0]:
+        columns.append(key)
+    # Sheet header, first row
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+    for row in rows_list:
+        row_num += 1
+        # print(row.get(columns[0]))
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row.get(columns[col_num]), font_style)
+    wb.save(response)
     return response
+
 
 '''三元组分析'''
 
@@ -800,37 +864,37 @@ def prb_stat(request):
 def analyze1(num):
     models.TbC2Inew.objects.all().delete()
     cursor = connection.cursor()
-    sql = "SELECT ServingSector, InterferingSector, COUNT(*), AVG( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS mean, " \
-          "STDDEV( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS std FROM tbmrodata GROUP BY ServingSector,InterferingSector"
+    sql = "call analyze1(" + str(num) + ")"
+    print(sql)
     cursor.execute(sql)
     rows = cursor.fetchall()
     for row in rows:
-        if (row[2] > num):
-            line = models.TbC2Inew(
-                nc_sector_id=row[1],
-                sc_sector_id=row[0],
-                rsrp_avg=row[3],
-                rsrp_std=row[4],
-                probility_9=stats.norm.cdf((9 - row[3]) / row[4]),
-                probility_6=stats.norm.cdf((6 - row[3]) / row[4]) - stats.norm.cdf(
-                    (-6 - row[3]) / row[4]),
-            )
-            line.save()
+        line = models.TbC2Inew(
+            nc_sector_id=row[1],
+            sc_sector_id=row[0],
+            rsrp_avg=row[2],
+            rsrp_std=row[3],
+            probility_9=stats.norm.cdf((9 - row[2]) / row[3]),
+            probility_6=stats.norm.cdf((6 - row[2]) / row[3]) - stats.norm.cdf(
+                (-6 - row[2]) / row[3]),
+        )
+        line.save()
     return "success"
 
 
 def analyze2(request):
     if request.method == "POST":
-        flag = float(request.POST.get("bound_arg"))/100.0
+        flag = float(request.POST.get("bound_arg")) / 100.0
         num = request.POST.get("control_arg")
-        if(num!=""):
+        if (num != ""):
             analyze1(int(num))
         try:
-            A_list = models.TbC2Inew.objects.values_list('sc_sector_id').annotate(Count('sc_sector_id')) # ('5641-129', 29)
+            A_list = models.TbC2Inew.objects.values_list('sc_sector_id').annotate(
+                Count('sc_sector_id'))  # ('5641-129', 29)
         except:
             print("error")
         row_list = []
-        dict=[]
+        dict = []
         for A in A_list:
             B_list = models.TbC2Inew.objects.values_list('nc_sector_id', 'probility_6').filter(
                 sc_sector_id=A[0])  # ('253917-2', 0.459995836019516)
@@ -839,10 +903,10 @@ def analyze2(request):
                     C_list = models.TbC2Inew.objects.values_list('sc_sector_id', 'probility_6').filter(
                         nc_sector_id=B[0])  # ('253917-2', 0.459995836019516)
                     for C in C_list:
-                        if (C[0]!=A[0]):
+                        if (C[0] != A[0]):
                             Prb_6 = models.TbC2Inew.objects.values_list('probility_6').filter(nc_sector_id=C[0],
                                                                                               sc_sector_id=A[0])
-                            temp=[A[0],B[0],C[0]]
+                            temp = [A[0], B[0], C[0]]
                             temp.sort();
                             if (temp not in dict and Prb_6.exists() and Prb_6[0][0] >= flag):
                                 line = models.tbC2I3(
