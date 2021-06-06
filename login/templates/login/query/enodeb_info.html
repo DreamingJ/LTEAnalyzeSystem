@@ -29,7 +29,7 @@
                 <form class="param" action="/infoquery/enodeb/" method="post">
                     {% csrf_token %}
                     <label>请输入基站ID</label>
-                    <input type="text" name="enodeb_id" id="enodebid" value="{{ enodeb_id }}">
+                    <input type="number" name="enodeb_id" id="enodebid" value="{{ enodeb_id }}">
                     <label>基站名称</label>
                     <input type="text" name="enodeb_name" id="enodebname" value="{{ enodeb_name }}"><br>
                     <div class="button">

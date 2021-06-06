@@ -28,9 +28,9 @@
             <div class="textbox">
                 <form class="param" action="/infoquery/cell/" method="post">
                     {% csrf_token %}
-                    <label>输入小区ID</label>
+                    <label>请输入小区ID</label>
                     <input type="text" name="cellid" id="cellid" value="{{ cellid }}">
-                    <label>或：小区名称</label>
+                    <label>小区名称</label>
                     <input type="text" name="cellname" id="cellname" value="{{ cellname }}"><br>
                     <div class="button">
                         <button type="submit" class="btn btn-primary float-right" name="submit" value="text">查询</button>

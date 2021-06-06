@@ -609,7 +609,7 @@ def cell_info(request):
             elif cellname and not cellid:
                 cell_dict = models.Tbcell.objects.filter(sector_name=cellname).values()
             elif cellid and cellname:
-                cell_dict = models.Tbcell.objects.filter(sector_id=cellid, cellname=cellname).values()
+                cell_dict = models.Tbcell.objects.filter(sector_id=cellid).values()
             if not cell_dict:
                 message = "请检查输入是否正确!"
                 return render(request, 'login/query/cell_info.html', locals())
@@ -632,7 +632,6 @@ def cell_info(request):
     return render(request, 'login/query/cell_info.html', locals())
 
 
-# TODO 逻辑，enoid要限定数字
 def enodeb_info(request):
     cell_dict = []
     enodeb_name = ''
@@ -650,8 +649,8 @@ def enodeb_info(request):
                 cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()  # 使用.values把对象转为字典
             elif enodeb_name and not enodeb_id:
                 cell_dict = models.Tbcell.objects.filter(enodeb_name=enodeb_name).values()
-            elif enodeb_id and enodeb_name:
-                cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id, enodeb_name=enodeb_name).values()
+            elif enodeb_id and enodeb_name:     # 都存在，根据id
+                cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()
             if not cell_dict:
                 message = "请检查输入是否正确!"
                 return render(request, 'login/query/enodeb_info.html', locals())
@@ -660,11 +659,6 @@ def enodeb_info(request):
             cell_dict = models.Tbcell.objects.filter(enodeb_name=enodeb_name).values()
         # 生成csv文件保存
         csv_file = "login/static/login/csv_files/enodeb_info.csv"
-        # tablehead = []
-        # rows_list = []
-        # for key, val in dict.items():
-        #     tablehead.append(key)
-        #     rows_list.append(val)
         with open(csv_file, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow(cell_dict[0].keys())
