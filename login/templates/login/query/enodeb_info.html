@@ -1,10 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
+{% load static %}
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- 上述meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'login/css/enodeb_info.css' %}" rel="stylesheet"/>
+    <title>LTE网络干扰分析系统-业务查询</title>
+
 </head>
 <body>
+
+<div class="container">
+    <div id="header">LTE网络干扰分析系统
+    </div>
+    <div class="sub-header">基站eNodeB信息查询</div>
+    {% if message %}
+        <script>
+            alert('{{ message }}');
+        </script>
+    {% endif %}
+    <div class="wrapper">
+        <div class="box-wrapper">
+            <div class="textbox">
+                <form class="param" action="/infoquery/enodeb/" method="post">
+                    {% csrf_token %}
+                    <label>请输入基站ID</label>
+                    <input type="number" name="enodeb_id" id="enodebid" value="{{ enodeb_id }}">
+                    <label>基站名称</label>
+                    <input type="text" name="enodeb_name" id="enodebname" value="{{ enodeb_name }}"><br>
+                    <div class="button">
+                        <button type="submit" class="btn btn-primary float-right" name="submit" value="text">查询</button>
+                    </div>
+                </form>
+            </div>
+            <div class="selectbox">
+                <form class="param" action="/infoquery/enodeb/" method="post">
+                    {% csrf_token %}
+                    <p>选择基站名称</p>
+                    <select name="selected">
+                        {% for name in name_list %}
+                            <option value={{ name }}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="button-low">
+                        <button type="submit" class="btn btn-primary float-right" name="submit" value="select">查询
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="export-container">
+                <form class="param" action="/infoquery/enodeb/" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary float-right" name="submit" value="export">导出查询数据</button>
+                </form>
+            </div>
+        </div>
+        {#border="1" cellspacing="2" cellpadding="4" bgcolor="#ffffff" class="table" align="center"#}
+        <div class="table-container">
+            <table cellspacing="2" cellpadding="2" bgcolor="#ffffff" class="table">
+                <thead>
+                <tr>
+                    <th>地区名称</th>
+                    <th>小区ID</th>
+                    <th id="secName">小区名称</th>
+                    <th>基站ID</th>
+                    <th>基站名称</th>
+                    <th>小区配置的频点编号</th>
+                    <th>物理小区标识</th>
+                    <th>主同步信号标识</th>
+                    <th>辅同步信号标识</th>
+                    <th>跟踪区编码</th>
+                    <th>设备厂家</th>
+                    <th>小区所属基站的经度</th>
+                    <th>小区所属基站的纬度</th>
+                    <th>基站类型</th>
+                    <th>小区天线方位角</th>
+                    <th>小区天线高度</th>
+                    <th>小区天线电下倾角</th>
+                    <th>小区天线机械下倾角</th>
+                    <th>总下倾角</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for dict in cell_dict %}
+                    <tr>
+                        {% for key,val in dict.items %}
+                            <td>{{ val }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+{#    以下三者的引用顺序是固定的#}
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.15.0/umd/popper.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 </body>
 </html>

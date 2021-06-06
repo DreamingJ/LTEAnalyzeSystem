@@ -21,7 +21,7 @@ body {
 
 .box-wrapper{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-around;
     align-items: center;
 }
@@ -35,11 +35,17 @@ body {
 
 .wrapper {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     width: 1000px;
     justify-content: space-around;
     margin-top: 20px;
 }
+
+/*.right-wrapper {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: space-around;*/
+/*}*/
 
 /*.parent-wrapper {*/
 /*    display: flex;*/
@@ -51,8 +57,8 @@ body {
 
 .textbox {
     width: 400px;
-    margin-bottom: -10px;
     display: flex;
+    margin-bottom: 10px;
     flex-direction: column;
     align-items: center;
     background-color: #88c7dd85;
@@ -91,12 +97,12 @@ body {
 }
 
 .table-container {
-    max-height: 500px;
+    /*max-height: 500px;*/
     overflow-y: auto;
     border: 2px solid #888;
     border-radius: 4px;
     background-color: #b3d7ff;
-    margin-left: -50px;
+    /*margin-left: -50px;*/
 }
 
 /*.table-container::-webkit-scrollbar {*/
@@ -108,26 +114,26 @@ body {
     font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
     background-color: transparent;
     margin: 16px 20px;
-    display: flex;
-    flex-direction: row;
 }
 
 .table td {
     text-align: center;
-    height: 45px;
+    /*height: 45px;*/
+    width: 90px;
     border-color: #888888;
 }
 
 .table th {
     text-align: center;
+    width: 90px;
     /*border: 0;*/
     border-color: #888888;
-    height: 45px;
+    /*height: 45px;*/
 }
 
 .table tr{
     display: flex;
-    flex-direction: column;
+    /*flex-direction: column;*/
 }
 
 .table thead{

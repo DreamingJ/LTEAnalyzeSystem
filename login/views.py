@@ -11,6 +11,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.db.models import Count, F
 from . import models, forms
 from scipy import stats
+import matplotlib.pyplot as plt
 import hashlib
 import xlrd
 import xlwt
@@ -521,8 +522,9 @@ def exportdata(request):
     return response
 
 
-# TODO 之后增加下拉框，用户能自由选择修改哪个缓冲区
 def connectmanage(request):
+    if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
+        return redirect('/login/')
     if request.method == "POST":
         time = request.POST.get('time')
         cachesize = request.POST.get('cachesize')
@@ -582,43 +584,91 @@ def infocate3(request):
 
 
 def info_query(request):
+    if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
+        return redirect('/login/')
     return render(request, 'login/query/info_query.html', locals())
 
 
 # show information of cell settings
 def cell_info(request):
     cell_dict = []
+    cellname = ''
+    cellid = ''
     message = ''
     # 过滤出所有小区名，并通过模板传递
     name_list = models.Tbcell.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
-        # 字典初始为空，查过之后就可以赋值， 重新render即可
-        # 判断是通过 name还是id 还是同时有，对enodbid要进行检查
+        if request.POST.get('submit') == 'export':
+            return load_csv(csv_filename="cell_info")
         if request.POST.get('submit') == 'text':
             cellname = request.POST.get('cellname')
             cellid = request.POST.get('cellid')
+            # 判断是通过 name还是id 还是同时有
             if cellid and not cellname:
                 cell_dict = models.Tbcell.objects.filter(sector_id=cellid).values()  # 使用.values把对象转为字典
             elif cellname and not cellid:
                 cell_dict = models.Tbcell.objects.filter(sector_name=cellname).values()
             elif cellid and cellname:
-                cell_dict = models.Tbcell.objects.filter(sector_id=cellid, cellname=cellname).values()
+                cell_dict = models.Tbcell.objects.filter(sector_id=cellid).values()
             if not cell_dict:
-                message = "请检查输入是否正确"
-            return render(request, 'login/query/cell_info.html', locals())
+                message = "请检查输入是否正确!"
+                return render(request, 'login/query/cell_info.html', locals())
         elif request.POST.get('submit') == 'select':
             cellname = request.POST.get('selected')
             cell_dict = models.Tbcell.objects.filter(sector_name=cellname).values()
-            return render(request, 'login/query/cell_info.html', locals())
+        # 生成csv文件保存
+        csv_file = "login/static/login/csv_files/cell_info.csv"
+        # tablehead = []
+        # rows_list = []
+        # for key, val in dict.items():
+        #     tablehead.append(key)
+        #     rows_list.append(val)
+        with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(cell_dict[0].keys())
+            for dict in cell_dict:
+                writer.writerow(dict.values())
+        return render(request, 'login/query/cell_info.html', locals())
     return render(request, 'login/query/cell_info.html', locals())
 
 
 def enodeb_info(request):
+    cell_dict = []
+    enodeb_name = ''
+    enodeb_id = ''
+    message = ''
+    # 过滤出所有基站名
+    name_list = models.Tbcell.objects.values_list("enodeb_name", flat=True).distinct()  # 查询表中所有基站名并去重
     if request.method == "POST":
-        pass
+        if request.POST.get('submit') == 'export':
+            return load_csv(csv_filename="enodeb_info")
+        if request.POST.get('submit') == 'text':
+            enodeb_name = request.POST.get('enodeb_name')
+            enodeb_id = request.POST.get('enodeb_id')
+            if enodeb_id and not enodeb_name:
+                cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()  # 使用.values把对象转为字典
+            elif enodeb_name and not enodeb_id:
+                cell_dict = models.Tbcell.objects.filter(enodeb_name=enodeb_name).values()
+            elif enodeb_id and enodeb_name:     # 都存在，根据id
+                cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()
+            if not cell_dict:
+                message = "请检查输入是否正确!"
+                return render(request, 'login/query/enodeb_info.html', locals())
+        elif request.POST.get('submit') == 'select':
+            enodeb_name = request.POST.get('selected')
+            cell_dict = models.Tbcell.objects.filter(enodeb_name=enodeb_name).values()
+        # 生成csv文件保存
+        csv_file = "login/static/login/csv_files/enodeb_info.csv"
+        with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(cell_dict[0].keys())
+            for dict in cell_dict:
+                writer.writerow(dict.values())
+        return render(request, 'login/query//enodeb_info.html', locals())
     return render(request, 'login/query/enodeb_info.html', locals())
 
 
+# TODO 分页
 def kpi_info(request):
     name_list = models.Tbkpi.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
@@ -634,11 +684,72 @@ def kpi_info(request):
 
         select_attr = request.POST.get('attr')  # 得到选择的属性
         # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
-        attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values(
-            "date", select_attr)
-        print(attr_list)
-        # TODO 画图
+        attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values("date", select_attr)
+        # 绘图 开始两行代码解决 plt 中文显示的问题
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.rcParams['axes.unicode_minus'] = False
+        x_date = [str(data['date']).split()[0] for data in attr_list]
+        y_value = [data[select_attr] for data in attr_list]
+        plt.figure(figsize=(10, 4), dpi=100)
+        plt.plot(x_date, y_value, marker="*", linewidth=1.0)
+        plt.grid(color="k", linestyle=":")
+        # plt.bar(x_date, y_value, width=0.5, color="#87CEFA")
+        plt.title("小区：" + cellname + "    属性：" + select_attr)
+        plt.xlabel('日期')
+        plt.ylabel('属性值')
+        for a, b in zip(x_date, y_value):
+            plt.text(a, b, b, ha='center', va='bottom', fontsize=12)
+        plt.savefig("login/static/login/images/kpi_info.png")
+        return render(request, 'login/query/image_kpi.html', locals())
     return render(request, 'login/query/kpi_info.html', locals())
+
+
+def kpi_info(request):
+    if request.method == "POST":
+        models.Tbprbnew.objects.all().delete()
+        cursor = connection.cursor()
+        sql = "call kpi_info()"
+        print(sql)
+        cursor.execute(sql)
+        cell_dict=models.Tbprbnew.objects.all().values()
+        csv_file = "login/static/login/csv_files/Tbprbnew.csv"
+        with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(cell_dict[0].keys())
+            for dict in cell_dict:
+                writer.writerow(dict.values())
+        name=''
+        time1=''
+        time2=''
+        num=0
+        sector_list=models.Tbprbnew.objects.filter(sector_name=name).values()
+        time_list=models.Tbprbnew.objects.filter(sector_name=name,date__gte=time1,date__lte=time2).values()
+
+    pass
+
+# TODO 此函数改为可复用的
+def load_image(request):
+    try:
+        with open("login/static/login/images/kpi_info.png", 'rb') as img_file:
+            response = HttpResponse(img_file)
+            response['Content-Type'] = 'application/octet-stream'
+            response['Content-Disposition'] = 'attachment;filename="kpi_info.png"'
+            return response
+    except FileNotFoundError:
+        response = HttpResponse("请先查询再导出！")
+        return response
+
+
+def load_csv(csv_filename):
+    try:
+        with open("login/static/login/csv_files/" + csv_filename + ".csv", 'rb') as csv_file:
+            response = HttpResponse(csv_file)
+            response['Content-Type'] = 'text/csv'
+            response['Content-Disposition'] = 'attachment;filename="cell_info.csv"'
+            return response
+    except FileNotFoundError:
+        response = HttpResponse("请先查询再导出！")
+        return response
 
 
 def prb_info(request):
