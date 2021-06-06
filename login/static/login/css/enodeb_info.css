@@ -1,0 +1,144 @@
+body {
+    height: 100%;
+    background-image: url('../images/bg2.jpg');
+}
+
+#header {
+    font-size: 35px;
+    color: #123844bf;
+    margin: 10px 0 10px 0px;
+    font-weight: bold;
+    align-self: center;
+}
+
+.sub-header {
+    font-size: 30px;
+    color: #0c1a27ed;
+    margin-top: -10px;
+    font-weight: bold;
+    align-self: center;
+}
+
+.box-wrapper{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 1000px;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+/*.parent-wrapper {*/
+/*    display: flex;*/
+/*    flex-direction: row;*/
+/*    justify-content: space-around;*/
+/*    margin-top: 0;*/
+/*    flex-wrap: nowrap;*/
+/*}*/
+
+.textbox {
+    width: 400px;
+    margin-bottom: -10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #88c7dd85;
+    border-radius: 10px;
+    opacity: 0.8;
+}
+
+.param {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.selectbox {
+    width: 400px;
+    /*margin-top: 50px;*/
+    /*margin-left: 100px;*/
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #88c7dd85;
+    border-radius: 10px;
+    margin-top: -15px;
+    opacity: 0.8;
+}
+
+/*.title {*/
+/*    margin: 10px 10px 10px 0;*/
+/*    font-size: 28px;*/
+/*    font-weight: 550;*/
+/*    color: #212529;*/
+/*}*/
+
+.button {
+    margin: 0 20px 20px;
+}
+
+.table-container {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 2px solid #888;
+    border-radius: 4px;
+    background-color: #b3d7ff;
+    margin-left: -50px;
+}
+
+/*.table-container::-webkit-scrollbar {*/
+/*    display: none;*/
+/*}*/
+
+.table {
+    font-size: 13px;
+    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+    background-color: transparent;
+    margin: 16px 20px;
+    display: flex;
+    flex-direction: row;
+}
+
+.table td {
+    text-align: center;
+    height: 45px;
+    border-color: #888888;
+}
+
+.table th {
+    text-align: center;
+    /*border: 0;*/
+    border-color: #888888;
+    height: 45px;
+}
+
+.table tr{
+    display: flex;
+    /*flex-direction: column;*/
+}
+
+.table thead{
+    /*border-right: 1px solid #39444e;*/
+}
+
+.button-low{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/*#secName {*/
+/*    min-width: 130px;*/
+/*}*/

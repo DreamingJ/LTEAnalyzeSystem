@@ -598,11 +598,12 @@ def cell_info(request):
     # 过滤出所有小区名，并通过模板传递
     name_list = models.Tbcell.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
-        # 字典初始为空，查过之后就可以赋值， 重新render即可
-        # 判断是通过 name还是id 还是同时有，对enodbid要进行检查
+        if request.POST.get('submit') == 'export':
+            return load_csv(csv_filename="cell_info")
         if request.POST.get('submit') == 'text':
             cellname = request.POST.get('cellname')
             cellid = request.POST.get('cellid')
+            # 判断是通过 name还是id 还是同时有
             if cellid and not cellname:
                 cell_dict = models.Tbcell.objects.filter(sector_id=cellid).values()  # 使用.values把对象转为字典
             elif cellname and not cellid:
@@ -628,17 +629,52 @@ def cell_info(request):
             for dict in cell_dict:
                 writer.writerow(dict.values())
         return render(request, 'login/query/cell_info.html', locals())
-    elif request.method == "GET":
-        return load_csv(csv_filename="cell_info")
     return render(request, 'login/query/cell_info.html', locals())
 
 
+# TODO 逻辑，enoid要限定数字
 def enodeb_info(request):
+    cell_dict = []
+    enodeb_name = ''
+    enodeb_id = ''
+    message = ''
+    # 过滤出所有基站名
+    name_list = models.Tbcell.objects.values_list("enodeb_name", flat=True).distinct()  # 查询表中所有基站名并去重
     if request.method == "POST":
-        pass
+        if request.POST.get('submit') == 'export':
+            return load_csv(csv_filename="enodeb_info")
+        if request.POST.get('submit') == 'text':
+            enodeb_name = request.POST.get('enodeb_name')
+            enodeb_id = request.POST.get('enodeb_id')
+            if enodeb_id and not enodeb_name:
+                cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()  # 使用.values把对象转为字典
+            elif enodeb_name and not enodeb_id:
+                cell_dict = models.Tbcell.objects.filter(enodeb_name=enodeb_name).values()
+            elif enodeb_id and enodeb_name:
+                cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id, enodeb_name=enodeb_name).values()
+            if not cell_dict:
+                message = "请检查输入是否正确!"
+                return render(request, 'login/query/enodeb_info.html', locals())
+        elif request.POST.get('submit') == 'select':
+            enodeb_name = request.POST.get('selected')
+            cell_dict = models.Tbcell.objects.filter(enodeb_name=enodeb_name).values()
+        # 生成csv文件保存
+        csv_file = "login/static/login/csv_files/enodeb_info.csv"
+        # tablehead = []
+        # rows_list = []
+        # for key, val in dict.items():
+        #     tablehead.append(key)
+        #     rows_list.append(val)
+        with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(cell_dict[0].keys())
+            for dict in cell_dict:
+                writer.writerow(dict.values())
+        return render(request, 'login/query//enodeb_info.html', locals())
     return render(request, 'login/query/enodeb_info.html', locals())
 
 
+# TODO 分页
 def kpi_info(request):
     name_list = models.Tbkpi.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
@@ -676,19 +712,28 @@ def kpi_info(request):
 
 # TODO 此函数改为可复用的
 def load_image(request):
-    img_file = open("login/static/login/images/kpi_info.png", 'rb')
-    response = HttpResponse(img_file)
-    response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = 'attachment;filename="kpi_info.png"'
-    return response
+    try:
+        with open("login/static/login/images/kpi_info.png", 'rb') as img_file:
+            response = HttpResponse(img_file)
+            response['Content-Type'] = 'application/octet-stream'
+            response['Content-Disposition'] = 'attachment;filename="kpi_info.png"'
+            return response
+    except FileNotFoundError:
+        response = HttpResponse("请先查询再导出！")
+        return response
 
 
 def load_csv(csv_filename):
-    csv_file = open("login/static/login/csv_files/" + csv_filename + ".csv", 'rb')
-    response = HttpResponse(csv_file)
-    response['Content-Type'] = 'text/csv'
-    response['Content-Disposition'] = 'attachment;filename="cell_info.csv"'
-    return response
+    try:
+        with open("login/static/login/csv_files/" + csv_filename + ".csv", 'rb') as csv_file:
+            response = HttpResponse(csv_file)
+            response['Content-Type'] = 'text/csv'
+            response['Content-Disposition'] = 'attachment;filename="cell_info.csv"'
+            return response
+    except FileNotFoundError:
+        response = HttpResponse("请先查询再导出！")
+        return response
+
 
 def prb_info(request):
     if request.method == "POST":

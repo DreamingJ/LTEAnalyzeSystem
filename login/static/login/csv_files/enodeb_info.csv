@@ -1,2 +1,4 @@
 city,sector_id,sector_name,enodebid,enodeb_name,earfcn,pci,pss,sss,tac,vendor,longitude,latitude,style,azimuth,height,electtilt,mechtilt,totletilt
 sanxia,124672-0,A池刘果-HLHF-1,124672,A池刘果-HLHF,38400,32,2,10,14531,华为,112.77068,33.810396,宏站,30.0,43.0,6.0,2.0,8.0
+sanxia,124672-1,A池刘果-HLHF-2,124672,A池刘果-HLHF,38400,30,0,10,14531,华为,112.77068,33.810396,宏站,150.0,43.0,6.0,2.0,8.0
+sanxia,124672-2,A池刘果-HLHF-3,124672,A池刘果-HLHF,38400,31,1,10,14531,华为,112.77068,33.810396,宏站,240.0,43.0,6.0,2.0,8.0
