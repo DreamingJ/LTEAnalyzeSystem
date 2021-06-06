@@ -42,6 +42,10 @@ body {
     opacity: 0.8;
 }
 
+.import-type{
+
+}
+
 .form-import {
     margin-left: 160px;
     display: flex;

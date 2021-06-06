@@ -762,27 +762,30 @@ def prb_info(request):
         select_index = request.POST.get('index')  # 得到选择的属性
         select_prb = "avr_noise_prb" + str(select_index)
         # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
-        attr_list = models.Tbprb.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values(
+        attr_list = models.Tbprbnew.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values(
             "date", select_prb)
         # 绘图 开始两行代码解决 plt 中文显示的问题
         plt.rcParams['font.sans-serif'] = ['SimHei']
         plt.rcParams['axes.unicode_minus'] = False
         x_date = [str(data['date']) for data in attr_list]
         y_value = [data[select_prb] for data in attr_list]
-        plt.figure(figsize=(10, 4), dpi=100)
+        plt.figure(figsize=(20, 10), dpi=100)
         plt.plot(x_date, y_value, marker="*", linewidth=1.0)
+
+        # plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(5))
+        plt.xticks(rotation=-90)
         plt.grid(color="k", linestyle=":")
         # plt.bar(x_date, y_value, width=0.5, color="#87CEFA")
         plt.title("小区：" + cellname + "    第" + select_index + "个PRB")
         plt.xlabel('时间（小时）')
         plt.ylabel(select_prb)
         for a, b in zip(x_date, y_value):
-            plt.text(a, b, b, ha='center', va='bottom', fontsize=12)
+            plt.text(a, b, b, ha='center', va='bottom', fontsize=10)
         plt.savefig("login/static/login/images/prb_info.png")
 
         img_dir = "login/images/prb_info.png"
         belong_func = "prb_info"
-        return render(request, 'login/query/image_kpi.html', locals())
+        return render(request, 'login/query/image_prb.html', locals())
     return render(request, 'login/query/prb_info.html', locals())
 
 
