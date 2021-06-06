@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db import models as md
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.db.models import Count, F
+from django.db.models import Count
 from . import models, forms
 from scipy import stats
 import matplotlib.pyplot as plt
@@ -28,6 +28,19 @@ class Variable(md.Model):
 
 
 # To encode the password
+
+def get_result_fromat(data, cols):
+    tmp_str = ""
+    for col in cols:
+        tmp_str += '"%s",' % (col)
+    yield tmp_str.strip(",") + "\n"
+    for row in data:
+        tmp_str = ""
+        for col in cols:
+            tmp_str += '"%s",' % (str(row[col]))
+        yield tmp_str.strip(',') + "\n"
+
+
 def hash_code(s, salt='LTEsystem'):
     h = hashlib.sha256()
     s += salt
@@ -649,7 +662,7 @@ def enodeb_info(request):
                 cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()  # 使用.values把对象转为字典
             elif enodeb_name and not enodeb_id:
                 cell_dict = models.Tbcell.objects.filter(enodeb_name=enodeb_name).values()
-            elif enodeb_id and enodeb_name:     # 都存在，根据id
+            elif enodeb_id and enodeb_name:  # 都存在，根据id
                 cell_dict = models.Tbcell.objects.filter(enodebid=enodeb_id).values()
             if not cell_dict:
                 message = "请检查输入是否正确!"
@@ -684,7 +697,8 @@ def kpi_info(request):
 
         select_attr = request.POST.get('attr')  # 得到选择的属性
         # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
-        attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values("date", select_attr)
+        attr_list = models.Tbkpi.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values(
+            "date", select_attr)
         # 绘图 开始两行代码解决 plt 中文显示的问题
         plt.rcParams['font.sans-serif'] = ['SimHei']
         plt.rcParams['axes.unicode_minus'] = False
@@ -700,42 +714,37 @@ def kpi_info(request):
         for a, b in zip(x_date, y_value):
             plt.text(a, b, b, ha='center', va='bottom', fontsize=12)
         plt.savefig("login/static/login/images/kpi_info.png")
+
+        img_dir = "login/images/kpi_info.png"
+        belong_func = "kpi_info"
         return render(request, 'login/query/image_kpi.html', locals())
     return render(request, 'login/query/kpi_info.html', locals())
 
 
-def kpi_info(request):
-    if request.method == "POST":
-        models.Tbprbnew.objects.all().delete()
-        cursor = connection.cursor()
-        sql = "call kpi_info()"
-        print(sql)
-        cursor.execute(sql)
-        cell_dict=models.Tbprbnew.objects.all().values()
-        csv_file = "login/static/login/csv_files/Tbprbnew.csv"
-        with open(csv_file, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow(cell_dict[0].keys())
-            for dict in cell_dict:
-                writer.writerow(dict.values())
-        name=''
-        time1=''
-        time2=''
-        num=0
-        sector_list=models.Tbprbnew.objects.filter(sector_name=name).values()
-        time_list=models.Tbprbnew.objects.filter(sector_name=name,date__gte=time1,date__lte=time2).values()
-
-    pass
-
 # TODO 此函数改为可复用的
 def load_image(request):
-    try:
-        with open("login/static/login/images/kpi_info.png", 'rb') as img_file:
-            response = HttpResponse(img_file)
-            response['Content-Type'] = 'application/octet-stream'
-            response['Content-Disposition'] = 'attachment;filename="kpi_info.png"'
-            return response
-    except FileNotFoundError:
+    if request.method == "POST":
+        if request.POST.get('export') == 'kpi_info':
+            try:
+                with open("login/static/login/images/kpi_info.png", 'rb') as img_file:
+                    response = HttpResponse(img_file)
+                    response['Content-Type'] = 'application/octet-stream'
+                    response['Content-Disposition'] = 'attachment;filename="kpi_info.png"'
+                    return response
+            except FileNotFoundError:
+                response = HttpResponse("请先查询再导出！")
+                return response
+        elif request.POST.get('export') == 'prb_info':
+            try:
+                with open("login/static/login/images/prb_info.png", 'rb') as img_file:
+                    response = HttpResponse(img_file)
+                    response['Content-Type'] = 'application/octet-stream'
+                    response['Content-Disposition'] = 'attachment;filename="prb_info.png"'
+                    return response
+            except FileNotFoundError:
+                response = HttpResponse("请先查询再导出！")
+                return response
+    else:
         response = HttpResponse("请先查询再导出！")
         return response
 
@@ -753,9 +762,97 @@ def load_csv(csv_filename):
 
 
 def prb_info(request):
+    range_list = [i for i in range(1, 100)]
+    name_list = models.Tbprb.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
-        pass
+        textname = request.POST.get('cellname')
+        selected = request.POST.get('selected')
+        if textname != '':
+            cellname = textname
+        else:
+            cellname = selected
+
+        date_start = request.POST.get('date_start')
+        date_end = request.POST.get('date_end')
+
+        select_index = request.POST.get('index')  # 得到选择的属性
+        select_prb = "avr_noise_prb" + str(select_index)
+        # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
+        attr_list = models.Tbprb.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values(
+            "date", select_prb)
+        # 绘图 开始两行代码解决 plt 中文显示的问题
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.rcParams['axes.unicode_minus'] = False
+        x_date = [str(data['date']) for data in attr_list]
+        y_value = [data[select_prb] for data in attr_list]
+        plt.figure(figsize=(10, 4), dpi=100)
+        plt.plot(x_date, y_value, marker="*", linewidth=1.0)
+        plt.grid(color="k", linestyle=":")
+        # plt.bar(x_date, y_value, width=0.5, color="#87CEFA")
+        plt.title("小区：" + cellname + "    第" + select_index + "个PRB")
+        plt.xlabel('时间（小时）')
+        plt.ylabel(select_prb)
+        for a, b in zip(x_date, y_value):
+            plt.text(a, b, b, ha='center', va='bottom', fontsize=12)
+        plt.savefig("login/static/login/images/prb_info.png")
+
+        img_dir = "login/images/prb_info.png"
+        belong_func = "prb_info"
+        return render(request, 'login/query/image_kpi.html', locals())
     return render(request, 'login/query/prb_info.html', locals())
+
+
+def prb_stat(request):
+    # TODO 使用触发器建表； 生成excel并导出
+    '''models.Tbprbnew.objects.all().delete()
+    cursor = connection.cursor()
+    sql = "call kpi_info()"
+    cursor.execute(sql)'''
+    # 通过StreamingHttpResponse指定返回格式为csv
+    '''response = StreamingHttpResponse(get_result_fromat(data, cols))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(out_file_name)
+    return response'''
+    '''def downloadTest(request):
+        def file_iterator(file_name, chunk_size=512):  # 用于形成二进制数据
+            with open(file_name, 'rb') as f:
+                while True:
+                    c = f.read(chunk_size)
+                    if c:
+                        yield c
+                    else:
+                        break
+
+        the_file_name = "D:\test.xls"  # 要下载的文件路径
+        response = StreamingHttpResponse(file_iterator(the_file_name))  # 这里创建返回
+        response['Content-Type'] = 'application/vnd.ms-excel'  # 注意格式 
+        response['Content-Disposition'] = 'attachment;filename="模板.xls"'''
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename= Tbprbnew.xls'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Tbprbnew')
+    rows = models.Tbprbnew.objects.all()
+    rows_list = list(rows.values())
+    columns = []
+    if not rows:
+        return render(request, "login/datamanage.html", {'message': '此数据表为空！'})
+    for key in rows_list[0]:
+        columns.append(key)
+    # Sheet header, first row
+    row_num = 0
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+    # Sheet body, remaining rows
+    font_style = xlwt.XFStyle()
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+    for row in rows_list:
+        row_num += 1
+        # print(row.get(columns[0]))
+        for col_num in range(len(row)):
+            ws.write(row_num, col_num, row.get(columns[col_num]), font_style)
+    wb.save(response)
+    return response
 
 
 '''三元组分析'''
