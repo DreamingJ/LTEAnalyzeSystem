@@ -700,22 +700,38 @@ def kpi_info(request):
         for a, b in zip(x_date, y_value):
             plt.text(a, b, b, ha='center', va='bottom', fontsize=12)
         plt.savefig("login/static/login/images/kpi_info.png")
+
+        img_dir = "login/images/kpi_info.png"
+        belong_func = "kpi_info"
         return render(request, 'login/query/image_kpi.html', locals())
     return render(request, 'login/query/kpi_info.html', locals())
 
 
-# TODO 此函数改为可复用的
 def load_image(request):
-    try:
-        with open("login/static/login/images/kpi_info.png", 'rb') as img_file:
-            response = HttpResponse(img_file)
-            response['Content-Type'] = 'application/octet-stream'
-            response['Content-Disposition'] = 'attachment;filename="kpi_info.png"'
-            return response
-    except FileNotFoundError:
+    if request.method == "POST":
+        if request.POST.get('export') == 'kpi_info':
+            try:
+                with open("login/static/login/images/kpi_info.png", 'rb') as img_file:
+                    response = HttpResponse(img_file)
+                    response['Content-Type'] = 'application/octet-stream'
+                    response['Content-Disposition'] = 'attachment;filename="kpi_info.png"'
+                    return response
+            except FileNotFoundError:
+                response = HttpResponse("请先查询再导出！")
+                return response
+        elif request.POST.get('export') == 'prb_info':
+            try:
+                with open("login/static/login/images/prb_info.png", 'rb') as img_file:
+                    response = HttpResponse(img_file)
+                    response['Content-Type'] = 'application/octet-stream'
+                    response['Content-Disposition'] = 'attachment;filename="prb_info.png"'
+                    return response
+            except FileNotFoundError:
+                response = HttpResponse("请先查询再导出！")
+                return response
+    else:
         response = HttpResponse("请先查询再导出！")
         return response
-
 
 def load_csv(csv_filename):
     try:
@@ -730,10 +746,50 @@ def load_csv(csv_filename):
 
 
 def prb_info(request):
+    range_list = [i for i in range(1, 100)]
+    name_list = models.Tbprb.objects.values_list("sector_name", flat=True).distinct()  # 查询表中所有小区名并去重
     if request.method == "POST":
-        pass
+        textname = request.POST.get('cellname')
+        selected = request.POST.get('selected')
+        if textname != '':
+            cellname = textname
+        else:
+            cellname = selected
+
+        date_start = request.POST.get('date_start')
+        date_end = request.POST.get('date_end')
+
+        select_index = request.POST.get('index')  # 得到选择的属性
+        select_prb = "avr_noise_prb" + str(select_index)
+        # 根据时间范围、属性、小区名查询，注意filter __gt  __lt
+        attr_list = models.Tbprb.objects.filter(sector_name=cellname, date__gte=date_start, date__lte=date_end).values(
+            "date", select_prb)
+        # 绘图 开始两行代码解决 plt 中文显示的问题
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.rcParams['axes.unicode_minus'] = False
+        x_date = [str(data['date']) for data in attr_list]
+        y_value = [data[select_prb] for data in attr_list]
+        plt.figure(figsize=(10, 4), dpi=100)
+        plt.plot(x_date, y_value, marker="*", linewidth=1.0)
+        plt.grid(color="k", linestyle=":")
+        # plt.bar(x_date, y_value, width=0.5, color="#87CEFA")
+        plt.title("小区：" + cellname + "    第" + select_index + "个PRB")
+        plt.xlabel('时间（小时）')
+        plt.ylabel(select_prb)
+        for a, b in zip(x_date, y_value):
+            plt.text(a, b, b, ha='center', va='bottom', fontsize=12)
+        plt.savefig("login/static/login/images/prb_info.png")
+
+        img_dir = "login/images/prb_info.png"
+        belong_func = "prb_info"
+        return render(request, 'login/query/image_kpi.html', locals())
     return render(request, 'login/query/prb_info.html', locals())
 
+
+def prb_stat(request):
+    # TODO 使用触发器建表； 生成excel并导出
+    response = HttpResponse("demo")
+    return response
 
 '''三元组分析'''
 

@@ -1,10 +1,99 @@
-<!DOCTYPE html>
+<!doctype html>
+{% load static %}
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- 上述meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'login/css/kpi_info.css' %}" rel="stylesheet"/>
+    <title>LTE网络干扰分析系统-业务查询</title>
+
 </head>
 <body>
+
+<div class="container">
+    <div id="header">LTE网络干扰分析系统
+    </div>
+    <div class="sub-header">PRB干扰数据查询</div>
+    {% if message %}
+        <script>
+            alert('{{ message }}');
+        </script>
+    {% endif %}
+    {#    <div class="wrapper">#}
+    {#    </div>#}
+    <div>
+        <form class="wrapper" id="prb_info" action="/infoquery/prb/" method="post">
+            {% csrf_token %}
+            <div class="left-wrapper">
+                <p>请选择您要查询的属性:</p>
+                <div class="name-container">
+                    <p>网元名称</p>
+                    <label>输入</label>
+                    <input type="text" name="cellname" id="cellname" form="prb_info"><br>
+                    <label>or<br>选择</label>
+                    <select name="selected" form="prb_info">
+                        {% for name in name_list %}
+                            <option value={{ name }}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="date-container">
+                    <p>起止时间（小时级）</p>
+                    起始：
+                    <input id="date" type="datetime-local" name="date_start" value="2020-07-17T00:00:00"
+                           min="2020-07-17T00:00:00"
+                           max="2020-07-19T23:00:00" step="3600" required><br><br>
+                    结束：
+                    <input id="date" type="datetime-local" name="date_end" value="2020-07-19T23:00:00"
+                           min="2020-07-17T00:00:00"
+                           max="2020-07-19T23:00:00" step="3600" required>
+                </div>
+
+            </div>
+
+            <div class="right-wrapper">
+                <p>请选择第多少个PRB上检测到的干扰噪声的平均值</p>
+                <div class="attr-container">
+                    {#                <select name="selected-index">#}
+                    {#                    {% for i in range_list %}#}
+                    {#                    <option value={{ i }}>{{ i }}</option>#}
+                    {#                    {% endfor %}#}
+                    {#                </select>#}
+                    <input class="index" type="radio" name="index" value=0 checked>第0个<br>
+                    {% for i in range_list %}
+                        <input class="index" type="radio" name="index" value={{ i }}>第{{ i }}个<br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="button-container">
+                <a href="/infoquery/prb_stat/">
+                    <button type="button" class="btn btn-primary float-right">生成新表并导出
+                    </button>
+                </a>
+                <button type="submit" class="btn btn-primary float-right">确认查询</button>
+            </div>
+        </form>
+    </div>
+
+    {#    <div>#}
+    {#        {% for name in attr_list %}#}
+    {#            <p>{{ name }}<p>#}
+    {#        {% endfor %}#}
+    {#    </div>#}
+</div>
+
+
+<div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+{#    以下三者的引用顺序是固定的#}
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.15.0/umd/popper.js"></script>
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 </body>
 </html>

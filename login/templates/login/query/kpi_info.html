@@ -29,6 +29,7 @@
         <form class="wrapper" id="kpi_info" action="/infoquery/kpi/" method="post">
             {% csrf_token %}
             <div class="left-wrapper">
+            <p>请选择您要查询的属性:</p>
                 <div class="name-container">
                     <p>小区名称</p>
                     <label>输入</label>
@@ -44,18 +45,15 @@
                     <p>日期</p>
                     起始：
                     <input id="date" type="date" name="date_start" value="2020-07-17" min="2020-07-17"
-                           max="2020-07-19" required>
-                    <p>结束：</p>
+                           max="2020-07-19" required><br><br>
+                    结束：
                     <input id="date" type="date" name="date_end" value="2020-07-19" min="2020-07-17"
                            max="2020-07-19" required>
                 </div>
-                <div class="button-container">
-                    <button type="submit" class="btn btn-primary float-right">确认</button>
-                </div>
+
             </div>
 
-            <div class="right-wrapper">
-                <p>请选择您要查询的属性:</p>
+
                 <div class="attr-container">
                     <br>
                     <input type="radio" name="attr" value="rpc_establish" checked>RRC连接建立完成次数<br>
@@ -97,7 +95,9 @@
                     <input type="radio" name="attr" value="enb_in_succ">eNB内切换出成功次数<br>
                     <input type="radio" name="attr" value="eno_in_request">eNB内切换出请求次数<br>
                 </div>
-            </div>
+        <div class="button-container">
+                    <button type="submit" class="btn btn-primary float-right">确认</button>
+                </div>
         </form>
     </div>
 
