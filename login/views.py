@@ -653,37 +653,37 @@ def prb_info(request):
 def analyze1(num):
     models.TbC2Inew.objects.all().delete()
     cursor = connection.cursor()
-    sql = "SELECT ServingSector, InterferingSector, COUNT(*), AVG( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS mean, " \
-          "STDDEV( tbmrodata.LteScRSRP - tbmrodata.LteNcRSRP ) AS std FROM tbmrodata GROUP BY ServingSector,InterferingSector"
+    sql = "call analyze1(" + str(num) + ")"
+    print(sql)
     cursor.execute(sql)
     rows = cursor.fetchall()
     for row in rows:
-        if (row[2] > num):
-            line = models.TbC2Inew(
-                nc_sector_id=row[1],
-                sc_sector_id=row[0],
-                rsrp_avg=row[3],
-                rsrp_std=row[4],
-                probility_9=stats.norm.cdf((9 - row[3]) / row[4]),
-                probility_6=stats.norm.cdf((6 - row[3]) / row[4]) - stats.norm.cdf(
-                    (-6 - row[3]) / row[4]),
-            )
-            line.save()
+        line = models.TbC2Inew(
+            nc_sector_id=row[1],
+            sc_sector_id=row[0],
+            rsrp_avg=row[2],
+            rsrp_std=row[3],
+            probility_9=stats.norm.cdf((9 - row[2]) / row[3]),
+            probility_6=stats.norm.cdf((6 - row[2]) / row[3]) - stats.norm.cdf(
+                (-6 - row[2]) / row[3]),
+        )
+        line.save()
     return "success"
 
 
 def analyze2(request):
     if request.method == "POST":
-        flag = float(request.POST.get("bound_arg"))/100.0
+        flag = float(request.POST.get("bound_arg")) / 100.0
         num = request.POST.get("control_arg")
-        if(num!=""):
+        if (num != ""):
             analyze1(int(num))
         try:
-            A_list = models.TbC2Inew.objects.values_list('sc_sector_id').annotate(Count('sc_sector_id')) # ('5641-129', 29)
+            A_list = models.TbC2Inew.objects.values_list('sc_sector_id').annotate(
+                Count('sc_sector_id'))  # ('5641-129', 29)
         except:
             print("error")
         row_list = []
-        dict=[]
+        dict = []
         for A in A_list:
             B_list = models.TbC2Inew.objects.values_list('nc_sector_id', 'probility_6').filter(
                 sc_sector_id=A[0])  # ('253917-2', 0.459995836019516)
@@ -692,10 +692,10 @@ def analyze2(request):
                     C_list = models.TbC2Inew.objects.values_list('sc_sector_id', 'probility_6').filter(
                         nc_sector_id=B[0])  # ('253917-2', 0.459995836019516)
                     for C in C_list:
-                        if (C[0]!=A[0]):
+                        if (C[0] != A[0]):
                             Prb_6 = models.TbC2Inew.objects.values_list('probility_6').filter(nc_sector_id=C[0],
                                                                                               sc_sector_id=A[0])
-                            temp=[A[0],B[0],C[0]]
+                            temp = [A[0], B[0], C[0]]
                             temp.sort();
                             if (temp not in dict and Prb_6.exists() and Prb_6[0][0] >= flag):
                                 line = models.tbC2I3(
