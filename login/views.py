@@ -4,9 +4,10 @@ import traceback
 
 from django.contrib import messages
 from django.db import connection, transaction
-from django.http import HttpResponse
+from django.http import HttpResponse,StreamingHttpResponse
 from django.shortcuts import render, redirect
 from django.db import models as md
+from django.core.paginator import Paginator
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.db.models import Count
 from . import models, forms
@@ -16,7 +17,6 @@ import hashlib
 import xlrd
 import xlwt
 import logging
-
 
 # Create your views here.
 class Variable(md.Model):
@@ -34,12 +34,11 @@ def get_result_fromat(data, cols):
     for col in cols:
         tmp_str += '"%s",' % (col)
     yield tmp_str.strip(",") + "\n"
-    for row in data:
+    for row in data.iterator():
         tmp_str = ""
         for col in cols:
             tmp_str += '"%s",' % (str(row[col]))
         yield tmp_str.strip(',') + "\n"
-
 
 def hash_code(s, salt='LTEsystem'):
     h = hashlib.sha256()
@@ -483,27 +482,27 @@ def exportdata(request):
     if request.method == 'POST':
         table_name = request.POST['tables-export']
         format = request.POST['format']
-        if format == 'excel':
-            response = HttpResponse(content_type='application/ms-excel')
-        else:
-            response = HttpResponse(content_type='text/csv')
         if (table_name == 'tbCell'):
-            rows = models.Tbcell.objects.all()
+            rows = models.Tbcell.objects.values()
+            first = rows.first()
         elif (table_name == 'tbKPI'):
-            rows = models.Tbkpi.objects.all()
+            rows = models.Tbkpi.objects.values()
+            first = rows.first()
         elif (table_name == 'tbPRB'):
-            rows = models.Tbprb.objects.all()
+            rows = models.Tbprb.objects.values()
+            first = rows.first()
         else:
-            rows = models.Tbmrodata.objects.all()
-        rows_list = list(rows.values())
+            rows = models.Tbmrodata.objects.values()
+            first = rows.first()
+            print(123456)
         columns = []
-        if not rows:
+        if not first:
             return render(request, "login/datamanage.html", {'message': '此数据表为空！'})
-        for key in rows_list[0]:
+        for key in first:
             columns.append(key)
         try:
             if format == 'excel':
-                # response = HttpResponse(content_type='application/ms-excel')
+                response = HttpResponse(content_type='application/ms-excel')
                 response['Content-Disposition'] = 'attachment; filename="' + table_name + '.xls"'
                 wb = xlwt.Workbook(encoding='utf-8')
                 ws = wb.add_sheet(table_name)
@@ -515,20 +514,18 @@ def exportdata(request):
                 font_style = xlwt.XFStyle()
                 for col_num in range(len(columns)):
                     ws.write(row_num, col_num, columns[col_num], font_style)
-                for row in rows_list:
+                for row in rows.iterator():
                     row_num += 1
                     # print(row.get(columns[0]))
                     for col_num in range(len(row)):
-                        ws.write(row_num, col_num, row.get(columns[col_num]), font_style)
+                        ws.write(row_num, col_num, row[columns[col_num]], font_style)
                 wb.save(response)
                 return response
             else:
                 # response = HttpResponse(content_type='text/csv')
-                response['Content-Disposition'] = 'attachment; filename="' + table_name + '.csv"'
-                writer = csv.writer(response)
-                writer.writerow(columns)
-                for row in rows_list:
-                    writer.writerow(row.values())
+                response = StreamingHttpResponse(get_result_fromat(rows,columns))
+                response['Content-Type'] = 'application/vnd.ms-excel'
+                response['Content-Disposition'] = 'attachment;filename="{0}"'.format(table_name + '.csv')
                 return response
         except:
             print('error')
@@ -809,49 +806,36 @@ def prb_stat(request):
     sql = "call kpi_info()"
     cursor.execute(sql)'''
     # 通过StreamingHttpResponse指定返回格式为csv
-    '''response = StreamingHttpResponse(get_result_fromat(data, cols))
-    response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(out_file_name)
-    return response'''
-    '''def downloadTest(request):
-        def file_iterator(file_name, chunk_size=512):  # 用于形成二进制数据
-            with open(file_name, 'rb') as f:
-                while True:
-                    c = f.read(chunk_size)
-                    if c:
-                        yield c
-                    else:
-                        break
-
-        the_file_name = "D:\test.xls"  # 要下载的文件路径
-        response = StreamingHttpResponse(file_iterator(the_file_name))  # 这里创建返回
-        response['Content-Type'] = 'application/vnd.ms-excel'  # 注意格式 
-        response['Content-Disposition'] = 'attachment;filename="模板.xls"'''
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename= Tbprbnew.xls'
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Tbprbnew')
-    rows = models.Tbprbnew.objects.all()
-    rows_list = list(rows.values())
+    row = models.Tbprbnew.objects.values().first()
     columns = []
-    if not rows:
-        return render(request, "login/datamanage.html", {'message': '此数据表为空！'})
-    for key in rows_list[0]:
+    for key in row:
         columns.append(key)
-    # Sheet header, first row
-    row_num = 0
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-    # Sheet body, remaining rows
-    font_style = xlwt.XFStyle()
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
-    for row in rows_list:
-        row_num += 1
-        # print(row.get(columns[0]))
-        for col_num in range(len(row)):
-            ws.write(row_num, col_num, row.get(columns[col_num]), font_style)
-    wb.save(response)
+
+    def get_result(cols):
+        tmp_str = ""
+        for col in cols:
+            tmp_str += '"%s",' % (col)
+        yield tmp_str.strip(",") + "\n"
+        for row in models.Tbprbnew.objects.values().iterator():
+            tmp_str = row['date'].strftime('%Y-%m-%d %H:%M:%S')+','
+            for i in range(1,len(cols)):
+                tmp_str += '"%s",' % (row[cols[i]])
+            yield tmp_str.strip(",") + "\n"
+    def get_result2(cols):
+        tmp_str = []
+        for col in cols:
+            tmp_str.append(col)
+        yield tmp_str
+        for row in models.Tbprbnew.objects.values().iterator():
+            tmp_str.clear()
+            tmp_str.append(row['date'].strftime('%Y-%m-%d %H:%M:%S'))
+            for i in range(1,len(cols)):
+                tmp_str.append(row[cols[i]])
+            yield tmp_str
+
+    response = StreamingHttpResponse(get_result(columns))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format('Tbprbnew.csv')
     return response
 
 
@@ -878,8 +862,9 @@ def analyze1(num):
         line.save()
     return "success"
 
-
+dict = []
 def analyze2(request):
+    paginator = Paginator(dict, 14)
     if request.method == "POST":
         flag = float(request.POST.get("bound_arg")) / 100.0
         num = request.POST.get("control_arg")
@@ -891,7 +876,6 @@ def analyze2(request):
         except:
             print("error")
         row_list = []
-        dict = []
         for A in A_list:
             B_list = models.TbC2Inew.objects.values_list('nc_sector_id', 'probility_6').filter(
                 sc_sector_id=A[0])  # ('253917-2', 0.459995836019516)
@@ -915,4 +899,10 @@ def analyze2(request):
                                 row_list.append(line)
         models.tbC2I3.objects.all().delete()
         models.tbC2I3.objects.bulk_create(row_list)
+        paginator = Paginator(dict, 14)  # 每页显示25条
+        contacts = paginator.get_page(1)
+    if request.method == "GET":
+        page = request.GET.get('page')
+        if page is not None:
+            contacts = paginator.get_page(page)
     return render(request, 'login/analyze.html', locals())
