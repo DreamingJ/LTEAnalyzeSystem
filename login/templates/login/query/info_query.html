@@ -20,7 +20,12 @@
 
     <div class="col">
         {% csrf_token %}
-
+        {% if message %}
+                <script>
+                        alert('{{ message }}');
+                </script>
+                {#                <div class="alert alert-warning alert-dismissible">{{ message }}</div>#}
+            {% endif %}
 {#        <div class="title">业务查询</div>#}
         <div id="sub-header">请选择您要查询的业务</div>
         <div class="login-wrapper">
@@ -48,6 +53,12 @@
             <div class="business1">
                 <a href="/infoquery/prb/">
                     <button type="button" class="btn btn-primary float-right">PRB干扰信息查询与统计
+                    </button>
+                </a>
+            </div>
+            <div class="business1">
+                <a href="/infoquery/louvain/">
+                    <button type="button" class="btn btn-primary float-right">网络干扰结构图分析
                     </button>
                 </a>
             </div>

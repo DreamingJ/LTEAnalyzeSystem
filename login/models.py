@@ -387,3 +387,19 @@ class Tbprbnew(models.Model):
     class Meta:
         managed = True
         db_table = 'tbprbnew'
+
+
+class Tbc2I(models.Model):
+    city = models.CharField(db_column='CITY', max_length=255, blank=True, null=True)  # Field name made lowercase.
+    scell = models.CharField(db_column='SCELL', primary_key=True, max_length=255)  # Field name made lowercase.
+    ncell = models.CharField(db_column='NCELL', max_length=255)  # Field name made lowercase.
+    prc2i9 = models.FloatField(db_column='PrC2I9', blank=True, null=True)  # Field name made lowercase.
+    c2i_mean = models.FloatField(db_column='C2I_Mean', blank=True, null=True)  # Field name made lowercase.
+    std = models.FloatField(db_column='Std', blank=True, null=True)  # Field name made lowercase.
+    samplecount = models.FloatField(db_column='SampleCount', blank=True, null=True)  # Field name made lowercase.
+    weightedc2i = models.FloatField(db_column='WeightedC2I', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = True
+        db_table = 'tbc2i'
+        unique_together = (('scell', 'ncell'),)

@@ -1,4 +1,5 @@
 import csv
+import os
 import time
 import traceback
 
@@ -10,6 +11,7 @@ from django.db import models as md
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.db.models import Count
 from . import models, forms
+from .pylouvain import PyLouvain
 from scipy import stats
 import matplotlib.pyplot as plt
 import hashlib
@@ -478,6 +480,7 @@ def importdata(request):
 
 
 def exportdata(request):
+    response = HttpResponse("请先查询再导出！")
     if not request.session.get('is_admin', None) and not request.session.get('is_login', None):
         return redirect('/login/')
     if request.method == 'POST':
@@ -721,7 +724,6 @@ def kpi_info(request):
     return render(request, 'login/query/kpi_info.html', locals())
 
 
-# TODO 此函数改为可复用的
 def load_image(request):
     if request.method == "POST":
         if request.POST.get('export') == 'kpi_info':
@@ -740,6 +742,16 @@ def load_image(request):
                     response = HttpResponse(img_file)
                     response['Content-Type'] = 'application/octet-stream'
                     response['Content-Disposition'] = 'attachment;filename="prb_info.png"'
+                    return response
+            except FileNotFoundError:
+                response = HttpResponse("请先查询再导出！")
+                return response
+        elif request.POST.get('export') == 'louvain':
+            try:
+                with open("login/static/login/images/louvain.png", 'rb') as img_file:
+                    response = HttpResponse(img_file)
+                    response['Content-Type'] = 'application/octet-stream'
+                    response['Content-Disposition'] = 'attachment;filename="louvain.png"'
                     return response
             except FileNotFoundError:
                 response = HttpResponse("请先查询再导出！")
@@ -806,40 +818,15 @@ def prb_info(request):
 
 
 def prb_stat(request):
-    # TODO 使用触发器建表； 生成excel并导出
-    '''models.Tbprbnew.objects.all().delete()
-    cursor = connection.cursor()
-    sql = "call kpi_info()"
-    cursor.execute(sql)'''
-    # 通过StreamingHttpResponse指定返回格式为csv
-    '''response = StreamingHttpResponse(get_result_fromat(data, cols))
-    response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(out_file_name)
-    return response'''
-    '''def downloadTest(request):
-        def file_iterator(file_name, chunk_size=512):  # 用于形成二进制数据
-            with open(file_name, 'rb') as f:
-                while True:
-                    c = f.read(chunk_size)
-                    if c:
-                        yield c
-                    else:
-                        break
-
-        the_file_name = "D:\test.xls"  # 要下载的文件路径
-        response = StreamingHttpResponse(file_iterator(the_file_name))  # 这里创建返回
-        response['Content-Type'] = 'application/vnd.ms-excel'  # 注意格式 
-        response['Content-Disposition'] = 'attachment;filename="模板.xls"'''
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename= Tbprbnew.xls'
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet('Tbprbnew')
     rows = models.Tbprbnew.objects.all()
-    rows_list = list(rows.values())
     columns = []
     if not rows:
-        return render(request, "login/datamanage.html", {'message': '此数据表为空！'})
-    for key in rows_list[0]:
+        return render(request, "login/query/info_query.html", {'message': '此数据表为空！'})
+    for key in rows.values()[0]:
         columns.append(key)
     # Sheet header, first row
     row_num = 0
@@ -849,11 +836,12 @@ def prb_stat(request):
     font_style = xlwt.XFStyle()
     for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
-    for row in rows_list:
+    for row in rows.values():
         row_num += 1
         # print(row.get(columns[0]))
-        for col_num in range(len(row)):
-            ws.write(row_num, col_num, row.get(columns[col_num]), font_style)
+        ws.write(row_num, 0, row['date'].strftime('%Y-%m-%d %H:%M:%S'), font_style)
+        for col_num in range(1, len(row)):
+            ws.write(row_num, col_num, row[columns[col_num]], font_style)
     wb.save(response)
     return response
 
@@ -893,6 +881,7 @@ def analyze2(request):
                 Count('sc_sector_id'))  # ('5641-129', 29)
         except:
             print("error")
+            return render(request, 'login/analyze.html', locals())
         row_list = []
         dict = []
         for A in A_list:
@@ -907,7 +896,7 @@ def analyze2(request):
                             Prb_6 = models.TbC2Inew.objects.values_list('probility_6').filter(nc_sector_id=C[0],
                                                                                               sc_sector_id=A[0])
                             temp = [A[0], B[0], C[0]]
-                            temp.sort();
+                            temp.sort()
                             if (temp not in dict and Prb_6.exists() and Prb_6[0][0] >= flag):
                                 line = models.tbC2I3(
                                     a_sector=A[0],
@@ -919,3 +908,20 @@ def analyze2(request):
         models.tbC2I3.objects.all().delete()
         models.tbC2I3.objects.bulk_create(row_list)
     return render(request, 'login/analyze.html', locals())
+
+
+'''
+louvain画干扰图,主逻辑在pylouvain模块
+'''
+
+
+def getLouImages(request):
+    if not os.path.exists("login/static/login/images/louvain.png"):
+        pyl = PyLouvain.from_sql()
+        partition, q = pyl.apply_method()
+        pyl.drawNetworkGraph(partition, q)
+    else:
+        time.sleep(3)
+    img_dir = "login/images/louvain.png"
+    belong_func = "louvain"
+    return render(request, 'login/query/image_louvain.html', locals())
