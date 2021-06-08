@@ -9,6 +9,10 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
     <link href="{% static 'login/css/datamanage.css' %}" rel="stylesheet"/>
+    {#    <link href="../../static/login/css/bootstrap.min.css" rel="stylesheet">#}
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.1.4.min.js"></script>
+    <script src="../../static/login/js/bootstrap.min.js"></script>
+    <script src="../../static/login/js/docs.min.js"></script>
     <title>LTE网络干扰分析系统-数据管理</title>
 
 </head>
@@ -25,34 +29,39 @@
             {% csrf_token %}
             {% if message %}
                 <script>
-                        alert('{{ message }}');
+                    alert('{{ message }}');
                 </script>
                 {#                <div class="alert alert-warning alert-dismissible">{{ message }}</div>#}
             {% endif %}
             <div class="title">数据导入</div>
             <div>导入目的表：
-            <select name="table">
-                <option value="tbcell">tbCell</option>
-                <option value="tbkpi">tbKPI</option>
-                <option value="tbprb">tbPRB</option>
-                <option value="tbmrodata">tbMROData</option>
-            </select><br>
-                </div>
+                <select name="table">
+                    <option value="tbcell">tbCell</option>
+                    <option value="tbkpi">tbKPI</option>
+                    <option value="tbprb">tbPRB</option>
+                    <option value="tbmrodata">tbMROData</option>
+                </select><br>
+            </div>
             <br>
             <div class="import-type">文件格式：
-            <input type="radio" name="format" value="excel" checked>.xlsx&nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="radio" name="format" value="csv">.csv<br>
+                <input type="radio" name="format" value="excel" checked>.xlsx&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="radio" name="format" value="csv">.csv<br>
             </div>
             <br>
             <div>
                 <p>源文件：</p>
-            <input id="file1" type="file" name="upfile" accept=".xls,.xlsx,.csv"/><br>
-            <br>
+                <input id="file1" type="file" name="upfile" accept=".xls,.xlsx,.csv" required/><br>
+                <br>
             </div>
 
             <div class="button">
-                <button type="submit" class="btn btn-primary float-right">导入</button>
+                <button type="submit" class="btn btn-primary float-right" onclick="OpenBar()">导入</button>
             </div>
+            <script>
+                function OpenBar() {
+                    window.open('/progress_bar/','_blank','top=250,left=500,width=700,height=300,menubar=no,toolbar=no, status=no,scrollbars=yes')
+                }
+            </script>
         </form>
     </div>
     <div class="col-right">
@@ -78,6 +87,7 @@
         </form>
     </div>
 </div>
+
 <div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

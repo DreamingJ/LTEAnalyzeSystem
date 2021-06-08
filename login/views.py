@@ -5,7 +5,7 @@ import traceback
 
 from django.contrib import messages
 from django.db import connection, transaction
-from django.http import HttpResponse,StreamingHttpResponse
+from django.http import HttpResponse, StreamingHttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.db import models as md
 from django.core.paginator import Paginator
@@ -180,9 +180,14 @@ def datamanage(request):
     return render(request, 'login/datamanage.html', locals())
 
 
+nrows = 1
+cur_row = 0         # 全局变量，导入进度条使用
 def importdata(request):
     # TODO 导入进度条
     # TODO filter很慢，加入判断是否已存在然后覆盖的逻辑后，插入时间大大增加，1s变为45s
+    global cur_row
+    global nrows
+    cur_row = 0
     logging.basicConfig(filename='import_data.log', filemode='w', level=logging.INFO,
                         format="%(asctime)s - %(levelname)s - %(message)s")
     once_row = 300  # 每次读取行数，可修改
@@ -326,6 +331,9 @@ def importdata(request):
                                 row = table.row_values(cur_row)
                                 date_pre = time.strptime(row[0], "%m/%d/%Y %H:%M:%S")
                                 date_insert = time.strftime("%Y-%m-%d %H:%M:%S", date_pre)
+                                if models.Tbprb.objects.filter(date=date_insert,
+                                                               sector_name=row[3]).count() != 0:  # 数据已存在，用新数据覆盖原数据
+                                    models.Tbprb.objects.filter(date=date_insert, sector_name=row[3]).delete()
                                 if row[0] != '' and row[3] != '':
                                     line = models.Tbprb(date=date_insert,
                                                         enodeb_name=row[1],
@@ -938,3 +946,21 @@ def getLouImages(request):
     img_dir = "login/images/louvain.png"
     belong_func = "louvain"
     return render(request, 'login/query/image_louvain.html', locals())
+
+
+'''
+进度条
+'''
+
+
+def progress_bar(request):
+    return render(request, 'progress.html')
+
+'''
+前端JS需要访问此程序来更新数据
+'''
+
+
+def show_progress(request):
+    num_progress = cur_row * 100 / nrows
+    return JsonResponse(num_progress, safe=False)

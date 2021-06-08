@@ -241,7 +241,7 @@ class Tbprb(models.Model):
 
 
 class Tbmrodata(models.Model):
-    timestamp = models.CharField(db_column='TimeStamp', max_length=30)  # Field name made lowercase.
+    timestamp = models.CharField(db_column='TimeStamp', max_length=30, primary_key=True)  # Field name made lowercase.
     servingsector = models.CharField(db_column='ServingSector', max_length=30)  # Field name made lowercase.
     interferingsector = models.CharField(db_column='InterferingSector', max_length=30)  # Field name made lowercase.
     ltescrsrp = models.FloatField(db_column='LteScRSRP', blank=True, null=True)  # Field name made lowercase.
@@ -252,6 +252,7 @@ class Tbmrodata(models.Model):
     class Meta:
         managed = True
         db_table = 'tbmrodata'
+        unique_together = (('timestamp', 'servingsector', 'interferingsector'),)
 
 
 class TbC2Inew(models.Model):

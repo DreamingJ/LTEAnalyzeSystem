@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import url
 from login import views
 
 urlpatterns = [
@@ -46,4 +47,6 @@ urlpatterns = [
     path('analyze/', views.analyze2),
     path('load_image/', views.load_image),
     path('load_csv/', views.load_csv),
+    url(r'^progress_bar/$', views.progress_bar),
+    url(r'^show_progress/$', views.show_progress)
 ]

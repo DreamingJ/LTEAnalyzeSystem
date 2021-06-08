@@ -12,9 +12,9 @@ body {
 }
 
 #footer {
-  background-color: #f1f1f1;
-  padding: 10px;
-  text-align: center;
+    background-color: #f1f1f1;
+    padding: 10px;
+    text-align: center;
 }
 
 .container {
@@ -42,7 +42,7 @@ body {
     opacity: 0.8;
 }
 
-.import-type{
+.import-type {
 
 }
 
@@ -73,4 +73,20 @@ body {
 
 .button {
     margin: 0 20px 20px;
+}
+
+.progress-div {
+    background: rgba(0, 0, 0, 0.03);
+    width: 1000px;
+    height: 140px;
+    padding: 60px 20px;
+    visibility: hidden;
+}
+
+.progress {
+    margin: 0;
+    /*position: fixed;*/
+    /*top: 100px;*/
+    /*left: 20px;*/
+    width: 100%;
 }

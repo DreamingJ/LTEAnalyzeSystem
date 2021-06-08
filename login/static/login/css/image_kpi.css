@@ -19,6 +19,24 @@ body {
     align-self: center;
 }
 
+.pl-wrapper{
+    display: flex;
+    flex-direction: row;
+
+}
+
+.text-container{
+    width: 300px;
+    margin-top: 60px;
+    margin-left: -50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #88c7dd85;
+    border-radius: 10px;
+    opacity: 0.8;
+}
+
 .container {
     display: flex;
     flex-direction: column;
