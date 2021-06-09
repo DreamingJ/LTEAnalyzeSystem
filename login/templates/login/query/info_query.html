@@ -13,66 +13,70 @@
 
 </head>
 <body>
-<div class="container">
-    <div id="header">LTE网络干扰分析系统
-        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业务查询</div>
-    </div>
+    <div class="container">
+        <div id="header">LTE网络干扰分析系统
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;业务查询</div>
+        </div>
 
-    <div class="col">
-        {% csrf_token %}
-        {% if message %}
+        <div class="col">
+            {% csrf_token %}
+            {% if message %}
                 <script>
-                        alert('{{ message }}');
+                    alert('{{ message }}');
                 </script>
                 {#                <div class="alert alert-warning alert-dismissible">{{ message }}</div>#}
             {% endif %}
-{#        <div class="title">业务查询</div>#}
-        <div id="sub-header">请选择您要查询的业务</div>
-        <div class="login-wrapper">
-            <div class="userManage">
-                <a href="/infoquery/cell/">
-                    <button type="button" class="btn btn-primary float-right">小区配置信息查询
-                    </button>
-                </a>
-            </div>
+            {#        <div class="title">业务查询</div>#}
+            <div id="sub-header">请选择您要查询的业务</div>
+            <div class="login-wrapper">
+                <div class="userManage">
+                    <a href="/infoquery/cell/">
+                        <button type="button" class="btn btn-primary float-right">小区配置信息查询
+                        </button>
+                    </a>
+                </div>
 
-            <div class="connectManage">
-                <a href="/infoquery/enodeb/">
-                    <button type="button" class="btn btn-primary float-right">基站eNodeB信息查询
-                    </button>
-                </a>
+                <div class="connectManage">
+                    <a href="/infoquery/enodeb/">
+                        <button type="button" class="btn btn-primary float-right">基站eNodeB信息查询
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="login-wrapper">
+                <div class="dataManage">
+                    <a href="/infoquery/kpi/">
+                        <button type="button" class="btn btn-primary float-right">小区KPI指标信息查询
+                        </button>
+                    </a>
+                </div>
+                <div class="business1">
+                    <a href="/infoquery/prb/">
+                        <button type="button" class="btn btn-primary float-right">PRB干扰信息查询与统计
+                        </button>
+                    </a>
+                </div>
+                <div class="business1">
+                    <a href="/infoquery/louvain/">
+                        <button type="button" class="btn btn-primary float-right">网络干扰结构图分析
+                        </button>
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="login-wrapper">
-            <div class="dataManage">
-                <a href="/infoquery/kpi/">
-                    <button type="button" class="btn btn-primary float-right">小区KPI指标信息查询
-                    </button>
-                </a>
-            </div>
-            <div class="business1">
-                <a href="/infoquery/prb/">
-                    <button type="button" class="btn btn-primary float-right">PRB干扰信息查询与统计
-                    </button>
-                </a>
-            </div>
-            <div class="business1">
-                <a href="/infoquery/louvain/">
-                    <button type="button" class="btn btn-primary float-right">网络干扰结构图分析
-                    </button>
-                </a>
-            </div>
-        </div>
-        </div>
+        <div class="return">
+        <a href="/manager/" style="font-size: 18px">
+        返回管理界面
+    </a>
     </div>
-</div> <!-- /container -->
-<div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-{#    以下三者的引用顺序是固定的#}
-<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
-<script src="https://cdn.bootcss.com/popper.js/1.15.0/umd/popper.js"></script>
-<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    </div>
+    <div id="footer" style="clear:both;text-align:center;margin-top: 200px;">© BUPT数据库课设小组</div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    {#    以下三者的引用顺序是固定的#}
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.15.0/umd/popper.js"></script>
+    <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 </body>
 </html>

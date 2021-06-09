@@ -53,6 +53,9 @@
                 </form>
             </div>
             <div class="export-container">
+                <a href="/infoquery/">
+                <button class="btn btn-primary float-right" type="button">返回其它查询</button>
+                </a>
                 <form class="param" action="/infoquery/cell/" method="post">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary float-right" name="submit" value="export">导出查询数据</button>

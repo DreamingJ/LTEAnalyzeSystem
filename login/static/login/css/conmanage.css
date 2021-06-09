@@ -17,6 +17,12 @@ body {
   text-align: center;
 }
 
+#return {
+    text-decoration: none;
+    font-size: 35px;
+    color: #123844bf;
+}
+
 .container {
     display: flex;
     flex-direction: column;

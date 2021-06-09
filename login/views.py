@@ -183,8 +183,6 @@ def datamanage(request):
 nrows = 1
 cur_row = 0         # 全局变量，导入进度条使用
 def importdata(request):
-    # TODO 导入进度条
-    # TODO filter很慢，加入判断是否已存在然后覆盖的逻辑后，插入时间大大增加，1s变为45s
     global cur_row
     global nrows
     cur_row = 0
@@ -899,6 +897,8 @@ def analyze2(request):
             print("error")
             return render(request, 'login/analyze.html', locals())
         row_list = []
+        # global dict
+        dict.clear()
         for A in A_list:
             B_list = models.TbC2Inew.objects.values_list('nc_sector_id', 'probility_6').filter(
                 sc_sector_id=A[0])  # ('253917-2', 0.459995836019516)
@@ -913,15 +913,7 @@ def analyze2(request):
                             temp = [A[0], B[0], C[0]]
                             temp.sort()
                             if (temp not in dict and Prb_6.exists() and Prb_6[0][0] >= flag):
-                                line = models.tbC2I3(
-                                    a_sector=A[0],
-                                    b_sector=B[0],
-                                    c_sector=C[0],
-                                )
                                 dict.append(temp)
-                                row_list.append(line)
-        models.tbC2I3.objects.all().delete()
-        models.tbC2I3.objects.bulk_create(row_list)
         paginator = Paginator(dict, 14)  # 每页显示25条
         contacts = paginator.get_page(1)
     if request.method == "GET":

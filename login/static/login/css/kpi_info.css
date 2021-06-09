@@ -98,4 +98,9 @@ button{
     flex-direction: column;
 }
 
-
+.export-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 200px;
+}
